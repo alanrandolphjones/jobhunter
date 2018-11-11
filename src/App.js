@@ -11,8 +11,8 @@ class App extends Component {
         //Response from the API
         console.log(res)
       })
-      .catch(e => {
-        console.log(e);
+      .catch(err => {
+        console.log(err);
         
       })
 
