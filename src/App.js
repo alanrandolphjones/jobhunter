@@ -5,25 +5,27 @@ import CustomNav from './components/CustomNav'
 import Home from './components/Home'
 
 class App extends Component {
-  componentDidMount() {
-    axios
-      .get('/healthcheck')
-      .then(res => {
-        //Response from the API
-        console.log(res)
-      })
-      .catch(err => {
-        console.log(err);
-        
-      })
+    state = {
+      user: null
+    }
 
+  login = async () => {
+    const res = await axios.get('/users')
+    return res.data.data[1]
+  }
+
+  componentDidMount = async () => {
+    const user = await this.login()
+    this.setState({
+      user
+    })
   }
 
   render() {
     return (
       <div className="App">
         <CustomNav />
-        <Home />
+        <Home user={this.state.user} />
       </div>
     );
     

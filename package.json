@@ -8,6 +8,7 @@
     "express": "^4.16.4",
     "express-jwt": "^5.3.1",
     "jsonwebtoken": "^8.3.0",
+    "mongoose": "^5.3.14",
     "react": "^16.6.3",
     "react-bootstrap": "^0.32.4",
     "react-dom": "^16.6.3",
@@ -19,7 +20,9 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "server": "nodemon ./index.js --ignore src/",
-    "start": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\""
+    "start": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\"",
+    "seeds": "node api/seeds/index.js"
+
   },
   "proxy": "http://localhost:3001/",
   "eslintConfig": {
