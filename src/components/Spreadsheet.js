@@ -5,7 +5,6 @@ import JobApp from './JobApp'
 export default class Spreadsheet extends Component {
     constructor(props) {
         super(props)
-
     }
 
     render() {
@@ -26,15 +25,12 @@ export default class Spreadsheet extends Component {
                     </thead>
                     <tbody>
                         {
-                            this.props.apps.map(function(app) {
-                                return <JobApp app={app} />
+                            this.props.apps.map(function(app, i) {
+                                return <JobApp app={app} key={app._id} index={i}/>
                             })
                         }
                     </tbody>
                 </Table>
-                {this.props.apps.map( app => {
-                    return JSON.stringify(app)
-                })}
             </div>
         )
     }
