@@ -9,56 +9,44 @@ export default class Home extends Component {
         super(props, context);
 
         this.handleSelect = this.handleSelect.bind(this);
+        this.changeTabs = this.changeTabs.bind(this)
 
         this.state = {
             key: 1,
             openTab: 'inProgress',
-            allApps: null,
-            appsInUse: null
+            apps: []
         };
     }
 
-        //I need a URL that will grant me all the job apps of ONE user, using user id as a string
+    componentDidMount = () => {
+        console.log(this.props)
+        const apps = this.changeTabs(this.state.openTab)
 
-    getApps = async () => {
-        const res = await axios.get('/jobApps')
-        const allApps = res.data.data
-        
-        return allApps
-
-    }
-
-    componentDidMount = async () => {
-        const allApps = await this.getApps()
-
-        const appsInUse = this.getAppsInUse(allApps, this.state.openTab)
-    
         this.setState({
-            allApps,
-            appsInUse
+            apps
         })
     }
 
-    getAppsInUse = (allApps, openTab) => {
-
-        const appsInUse = allApps.filter(app => {
-            return app.progress[0].state === openTab
+    changeTabs = (openTab) => {
+        let allApps = this.props.user.jobApps
+        let apps = []
+        allApps.forEach(app => {
+            if (app.progress[0].state === openTab) apps.push(app)
         })
 
-        return appsInUse
+        return apps
     }
 
     handleSelect(key) {
-        const openTab = key === 1 
-            ? 'inProgress' 
+        const openTab = key === 1
+            ? 'inProgress'
             : 'completed'
-
-        const appsInUse = this.getAppsInUse(this.state.allApps, openTab)
-
+        const apps = this.changeTabs(openTab)
+        
         this.setState({ 
+            apps,
             key, 
-            openTab,
-            appsInUse
+            openTab
         });
     }
     render() {
@@ -73,7 +61,7 @@ export default class Home extends Component {
                         <Tab eventKey={1} title="In Progress"></Tab>
                         <Tab eventKey={2} title="Completed"></Tab>
                     </Tabs>
-                    <Spreadsheet openTab={this.state.openTab} user={this.props.user} apps={this.state.appsInUse}/>
+                    <Spreadsheet openTab={this.state.openTab} apps={this.state.apps}/>
                 </Grid>
             </div>
         )

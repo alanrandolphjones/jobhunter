@@ -12,6 +12,7 @@
     "react": "^16.6.3",
     "react-bootstrap": "^0.32.4",
     "react-dom": "^16.6.3",
+    "react-router-dom": "^4.3.1",
     "react-scripts": "2.1.1"
   },
   "scripts": {
@@ -22,7 +23,6 @@
     "server": "nodemon ./index.js --ignore src/",
     "start": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\"",
     "seeds": "node api/seeds/index.js"
-
   },
   "proxy": "http://localhost:3001/",
   "eslintConfig": {

@@ -1,8 +1,8 @@
 // seeds/index.js
-const User = require('../models/User')
-const { JobApp } = require('../models/JobApp')
+const { User, JobApp, Progress } = require('../models/User')
+// const { JobApp } = require('../models/JobApp')
 const users = require('./users')
-const jobApps = require('./jobApps')
+// const jobApps = require('./jobApps')
 const mongoose = require('mongoose')
 const uri = 'mongodb://localhost:27017/jobhunter'
 
@@ -20,7 +20,7 @@ const makeSeeds = async () => {
     // save all our users into the database
     await Promise.all(users.map(user => user.save()))
     // save our seeded post into the database
-    await Promise.all(jobApps.map(jobApp => jobApp.save()))
+    // await Promise.all(jobApps.map(jobApp => jobApp.save()))
     // that's it! close the connection
     mongoose.connection.close()
 }

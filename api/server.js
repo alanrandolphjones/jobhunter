@@ -9,7 +9,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 app.use('/users', require('./routes/users'))
-app.use('/jobApps', require('./routes/jobApps'))
 
 app.use((err, req, res, next) => {
   if (err.name === 'UnauthorizedError') {

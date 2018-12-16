@@ -1,7 +1,7 @@
 const express = require('express')
 const Router = express.Router
 const router = Router()
-const User = require('../models/User')
+const { User, Progress, JobApp } = require('../models/User')
 
 // GET /users
 router.get('/', async (req, res, next) => {
