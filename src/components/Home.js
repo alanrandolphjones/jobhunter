@@ -1,8 +1,6 @@
 import React, { Component } from 'react'
 import Spreadsheet from './Spreadsheet'
 import { Grid, Tabs, Tab } from 'react-bootstrap'
-import axios from 'axios'
-// import { CLIENT_RENEG_LIMIT } from 'tls';
 
 export default class Home extends Component {
     constructor(props, context) {
@@ -19,7 +17,6 @@ export default class Home extends Component {
     }
 
     componentDidMount = () => {
-        console.log(this.props)
         const apps = this.changeTabs(this.state.openTab)
 
         this.setState({

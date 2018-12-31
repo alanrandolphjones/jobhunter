@@ -1,4 +1,6 @@
 import React, { Component } from 'react'
+import { Button, Modal } from 'react-bootstrap'
+import EditJobApp from './EditJobApp'
 
 export default class JobApp extends Component {
     constructor(props) {
@@ -6,9 +8,20 @@ export default class JobApp extends Component {
 
         this.state = {
             expanded: false,
+            show: false
         }
 
         this.handleClick = this.handleClick.bind(this)
+        this.handleShow = this.handleShow.bind(this);
+        this.handleClose = this.handleClose.bind(this);
+    }
+
+    handleClose() {
+        this.setState({ show: false });
+    }
+
+    handleShow() {
+        this.setState({ show: true });
     }
 
     componentDidMount() {
@@ -18,11 +31,8 @@ export default class JobApp extends Component {
             const newObj = {
                 [property]: this.props.app[property]
             }
-            console.log(newObj)
             return newObj
         })
-
-        console.log(appProperties)
 
         this.setState({
             appProperties
@@ -72,16 +82,30 @@ export default class JobApp extends Component {
                                     <li>Contact Email: {this.props.app.contactEmail}</li>
                                     :
                                     <li>Contact Email: N/A</li>
-                                }                               {this.props.app.postingUrl ?
+                                }                               
+                                {this.props.app.postingUrl ?
                                     <li>Job Posting: {this.props.app.postingUrl}</li>
                                     :
                                     <li>Job Posting: N/A</li>
-                                }                               {this.props.app.comments ?
+                                }                               
+                                {this.props.app.comments ?
                                     <li>Comments: {this.props.app.comments}</li>
                                     :
                                     <li>Comments: N/A</li>
                                 }                               
                             </ul>
+                            <Button bsStyle="primary" bsSize="large" onClick={this.handleShow}>
+                                Edit application details
+                            </Button>
+                            <Modal
+                                show={this.state.show}
+                                onHide={this.handleClose}
+                            >
+                                <EditJobApp
+                                    handleClose={this.handleClose}
+                                    properties={this.props.app}
+                                ></EditJobApp>
+                            </Modal>
                         </td>
                     </tr> 
                 : null

@@ -21,18 +21,21 @@ class App extends Component {
 
   componentDidMount = async () => {
     const user = await this.login()
-    console.log(user)
     this.setState({
       user
     })
   }
 
+
+
   render() {
-  
+
     return (
       <Router>
         <div className="App">
+
           <CustomNav />
+
           <Route 
             exact
             path="/" 
@@ -47,6 +50,7 @@ class App extends Component {
                 />
             )}
           />
+
           <Route 
             path="/user/:userId"
             render={ () => (
@@ -60,6 +64,7 @@ class App extends Component {
                 />
             )}
           />
+
           <Route 
             path="/login"
             render={ () => (
@@ -71,7 +76,9 @@ class App extends Component {
               <div>Login Screen</div> 
             )}
           />
+
         </div>
+
       </Router>
     );
     

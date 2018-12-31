@@ -1,16 +1,31 @@
 import React, { Component } from 'react'
-import { Table } from 'react-bootstrap'
+import { Table, Button, Modal } from 'react-bootstrap'
 import JobApp from './JobApp'
+import EditJobApp from './EditJobApp'
 
 export default class Spreadsheet extends Component {
-    constructor(props) {
-        super(props)
+    constructor(props, context) {
+        super(props, context);
+
+        this.handleShow = this.handleShow.bind(this);
+        this.handleClose = this.handleClose.bind(this);
+
+        this.state = {
+            show: false
+        };
+    }
+
+    handleClose() {
+        this.setState({ show: false });
+    }
+
+    handleShow() {        
+        this.setState({ show: true });
     }
 
     render() {
 
         if (!this.props.apps) return <div>Loading!</div>
-        console.log(this.props.apps)
         if (this.props.apps) return (
             <div>
                 <Table bordered responsive >
@@ -30,7 +45,26 @@ export default class Spreadsheet extends Component {
                             })
                         }
                     </tbody>
+                    <tfoot>
+                        <tr>
+                            <th></th>
+                            <th colSpan="3">
+                                <Button bsStyle="primary" bsSize="large" onClick={this.handleShow}>
+                                    Add job application
+                                </Button>
+                            </th>
+                            <th></th>
+                        </tr>
+                    </tfoot>
                 </Table>
+                <Modal 
+                    show={this.state.show} 
+                    onHide={this.handleClose}
+                >
+                    <EditJobApp
+                        handleClose={this.handleClose}
+                    ></EditJobApp>
+                </Modal>
             </div>
         )
     }
