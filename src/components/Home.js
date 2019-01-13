@@ -17,18 +17,26 @@ export default class Home extends Component {
     }
 
     componentDidMount = () => {
-        const apps = this.changeTabs(this.state.openTab)
+        const apps = this.changeTabs(this.state.openTab, this.props.user)
 
         this.setState({
             apps
         })
     }
 
-    changeTabs = (openTab) => {
-        let allApps = this.props.user.jobApps
+    componentWillReceiveProps = (newProps) => {
+        const apps = this.changeTabs(this.state.openTab, newProps.user)
+
+        this.setState({
+            apps
+        })
+    }
+    changeTabs = (openTab, user) => {
+        let allApps = user.jobApps
         let apps = []
-        allApps.forEach(app => {
-            if (app.progress[0].state === openTab) apps.push(app)
+        
+        allApps.forEach(app => {            
+            if (app.progress.state === openTab) apps.push(app)
         })
 
         return apps
@@ -38,7 +46,7 @@ export default class Home extends Component {
         const openTab = key === 1
             ? 'inProgress'
             : 'completed'
-        const apps = this.changeTabs(openTab)
+        const apps = this.changeTabs(openTab, this.props.user)
         
         this.setState({ 
             apps,
@@ -58,7 +66,12 @@ export default class Home extends Component {
                         <Tab eventKey={1} title="In Progress"></Tab>
                         <Tab eventKey={2} title="Completed"></Tab>
                     </Tabs>
-                    <Spreadsheet openTab={this.state.openTab} apps={this.state.apps}/>
+                    <Spreadsheet 
+                        openTab={this.state.openTab} 
+                        apps={this.state.apps} 
+                        user={this.props.user}
+                        getUserData={this.props.getUserData}
+                    />
                 </Grid>
             </div>
         )

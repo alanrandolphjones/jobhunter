@@ -104,6 +104,8 @@ export default class JobApp extends Component {
                                 <EditJobApp
                                     handleClose={this.handleClose}
                                     properties={this.props.app}
+                                    user={this.props.user}
+                                    getUserData={this.props.getUserData}
                                 ></EditJobApp>
                             </Modal>
                         </td>

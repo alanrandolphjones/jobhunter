@@ -31,7 +31,8 @@ const progressSchema = new Schema({
         type: String
     },
     state: {
-        type: String
+        type: String,
+        default: 'inProgress'
     }
 })
 
@@ -64,7 +65,7 @@ const jobAppSchema = new Schema({
     comments: {
         type: String
     },
-    progress: [progressSchema]
+    progress: progressSchema
 })
 
 const userSchema = new Schema({

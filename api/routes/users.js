@@ -1,7 +1,7 @@
 const express = require('express')
 const Router = express.Router
 const router = Router()
-const { User } = require('../models/User')
+const { User, JobApp } = require('../models/User')
 
 // GET /users
 router.get('/', async (req, res, next) => {
@@ -34,6 +34,35 @@ router.get('/:user_id', async (req, res, next) => {
         // 4. If we don't handle the error 
         next(e)
     }
+})
+
+router.put('/:user_id/jobApp', async (req, res) => {
+
+    
+
+    const user = new User(req.body.user)
+
+    User.findByIdAndUpdate(
+        user._id, 
+        { $set: user })
+        .then(doc => {
+            console.log(doc)
+            res.status(201).json({ message: "Success", payload: doc });
+        })
+        .catch(err => {
+            console.log(err);
+
+            res.status(500).json({ message: err.message });
+        });
+
+
+    // user.jobApps.push(jobApp)
+
+    //Currently getting error because of duplicate IDs. Is there a way to alter data instead of replacing? https://stackoverflow.com/questions/45539709/how-to-update-only-some-properties-of-object-in-mongodb-database
+    
+    // user.save()
+        
+     
 })
 
 // Export router so that it is available to our server

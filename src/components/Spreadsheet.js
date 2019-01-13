@@ -25,6 +25,8 @@ export default class Spreadsheet extends Component {
 
     render() {
 
+        const user = this.props.user
+        const getUserData = this.props.getUserData
         if (!this.props.apps) return <div>Loading!</div>
         if (this.props.apps) return (
             <div>
@@ -41,7 +43,13 @@ export default class Spreadsheet extends Component {
                     <tbody>
                         {
                             this.props.apps.map(function(app, i) {
-                                return <JobApp app={app} key={app._id} index={i}/>
+                                return <JobApp 
+                                    app={app} 
+                                    key={app._id} 
+                                    index={i} 
+                                    user={user}
+                                    getUserData={getUserData}
+                                />
                             })
                         }
                     </tbody>
@@ -63,6 +71,8 @@ export default class Spreadsheet extends Component {
                 >
                     <EditJobApp
                         handleClose={this.handleClose}
+                        user={this.props.user}
+                        getUserData={this.props.getUserData}
                     ></EditJobApp>
                 </Modal>
             </div>

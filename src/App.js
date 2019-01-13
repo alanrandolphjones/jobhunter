@@ -12,18 +12,19 @@ class App extends Component {
       this.state = {
         user: null
       }
+      this.getUserData = this.getUserData.bind(this)
     }
 
-  login = async () => {
+  getUserData = async () => {
     const res = await axios.get('/users')
-    return res.data.data[1]
-  }
-
-  componentDidMount = async () => {
-    const user = await this.login()
+    const user = res.data.data[1]
     this.setState({
       user
     })
+  }
+
+  componentDidMount = async () => {
+    this.getUserData()
   }
 
 
@@ -57,6 +58,7 @@ class App extends Component {
               this.state.user ?
                 <Home
                   user={this.state.user}
+                  getUserData={this.getUserData}
                 />
               :
                 <Redirect 
