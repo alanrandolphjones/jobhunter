@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
-import { Button, Modal } from 'react-bootstrap'
+import { Table, Button, Modal } from 'react-bootstrap'
 import EditJobApp from './EditJobApp'
+import Progress from './Progress'
 
 export default class JobApp extends Component {
     constructor(props) {
@@ -8,7 +9,10 @@ export default class JobApp extends Component {
 
         this.state = {
             expanded: false,
-            show: false
+            show: false,
+            appProperties: null,
+            // progress: null,
+            // nextActionDate: ''
         }
 
         this.handleClick = this.handleClick.bind(this)
@@ -25,19 +29,66 @@ export default class JobApp extends Component {
     }
 
     componentDidMount() {
+
+        const appProperties = this.getAppProperties()
+        // const progress = this.getAppProgress()
+        // const nextActionDate = this.getNextActionDate(progress) || new Date()
+        
+        this.setState({
+            appProperties,
+        })
+        
+    }
+
+    getAppProperties() {
+
         const appPropertiesArray = Object.keys(this.props.app)
 
+        const titles = {
+            position: 'Position',
+            company: 'Company',
+            contactEmail: 'Contact Email',
+            jobBoard: 'Job Board',
+            postingUrl: 'Job Posting',
+            postDate: 'Date Posted',
+            comments: 'Comments',
+        }
         const appProperties = appPropertiesArray.map((property) => {
-            const newObj = {
+
+            for (let title in titles) {
+                if (title === property) {
+                    let newObj = {
+                        [property]: this.props.app[property],
+                        title: titles[title],
+                        input: property
+                    }
+
+                    if (property === 'postDate') {
+                        const dateObj = new Date(newObj.postDate)
+                        newObj.dateString = this.getDateString(dateObj)
+                    }
+
+                    return newObj
+                }
+            }
+            let newObj = {
                 [property]: this.props.app[property]
             }
             return newObj
         })
 
-        this.setState({
-            appProperties
-        })
+        return appProperties
 
+    }
+
+    getDateString(dateObj) {
+        const month = dateObj.getMonth()
+        const year = dateObj.getFullYear()
+        const date = dateObj.getDate()
+
+        const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+
+        return `${months[month]} ${date}, ${year}`
     }
 
     handleClick() {
@@ -66,35 +117,47 @@ export default class JobApp extends Component {
                     <tr>
                         <td></td>
                         <td colSpan="3">
-                            <ul>
-                                <li>Position: {this.props.app.position}</li>
-                                {this.props.app.company ? 
-                                    <li>Company: {this.props.app.company}</li>
-                                :
-                                    <li>Company: N/A</li>
+                            <Table bordered responsive>
+                                <tbody>
+                                {
+                                    this.state.appProperties.map((appProp, i) => {     
+                                        if (appProp[appProp.input] && !appProp.postDate && !appProp.postingUrl && !appProp.contactEmail) {
+                                            return (
+                                                <tr key={i}>
+                                                    <th>{appProp.title}:</th>
+                                                    <th>{appProp[appProp.input]}</th>
+                                                </tr>
+                                            )
+                                        }
+                                        if (appProp.postDate) {
+                                            return (
+                                                <tr key={i}>
+                                                    <th>{appProp.title}:</th>
+                                                    <th>{appProp.dateString}</th>
+                                                </tr>
+                                            )
+                                        }
+                                        if (appProp.postingUrl) {
+                                            return (
+                                                <tr key={i}>
+                                                    <th>{appProp.title}:</th>
+                                                    <th><a href={appProp.postingUrl}>{appProp.postingUrl}</a></th>
+                                                </tr>
+                                            )
+                                        }
+                                        if (appProp.contactEmail) {
+                                            return (
+                                                <tr key={i}>
+                                                    <th>{appProp.title}:</th>
+                                                    <th><a href={`mailto:${appProp.contactEmail}`}>{appProp.contactEmail}</a></th>
+                                                </tr>                                               
+                                            )
+                                        }
+                                    })
                                 }
-                                {this.props.app.contactFirstName || this.props.contactLastName ?
-                                    <li>Contact: {this.props.app.contactFirstName}</li>
-                                    :
-                                    <li>Contact Email: N/A</li>
-                                }
-                                {this.props.app.contactEmail ?
-                                    <li>Contact Email: {this.props.app.contactEmail}</li>
-                                    :
-                                    <li>Contact Email: N/A</li>
-                                }                               
-                                {this.props.app.postingUrl ?
-                                    <li>Job Posting: {this.props.app.postingUrl}</li>
-                                    :
-                                    <li>Job Posting: N/A</li>
-                                }                               
-                                {this.props.app.comments ?
-                                    <li>Comments: {this.props.app.comments}</li>
-                                    :
-                                    <li>Comments: N/A</li>
-                                }                               
-                            </ul>
-                            <Button bsStyle="primary" bsSize="large" onClick={this.handleShow}>
+                                </tbody>
+                            </Table>
+                            <Button bsStyle="primary" bsSize="small" onClick={this.handleShow}>
                                 Edit application details
                             </Button>
                             <Modal
@@ -108,6 +171,16 @@ export default class JobApp extends Component {
                                     getUserData={this.props.getUserData}
                                 ></EditJobApp>
                             </Modal>
+                            <Progress
+                                progress={this.props.app.progress}
+                                getDateString={this.getDateString}
+                            >
+
+                            </Progress>
+                            <div>
+                                <h3>What are your next steps?</h3>
+                                <p>Followup with recruiter [one week from application date]</p>
+                            </div>
                         </td>
                     </tr> 
                 : null

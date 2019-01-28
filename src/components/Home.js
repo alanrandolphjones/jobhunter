@@ -34,10 +34,16 @@ export default class Home extends Component {
     changeTabs = (openTab, user) => {
         let allApps = user.jobApps
         let apps = []
-        
-        allApps.forEach(app => {            
-            if (app.progress.state === openTab) apps.push(app)
-        })
+        if (openTab === 'completed') {
+            allApps.forEach(app => {            
+                if (app.progress.state === openTab) apps.push(app)
+            })
+        } else {
+            allApps.forEach(app => {
+                console.log(app)
+                if (app.progress.state !== 'completed') apps.push(app)
+            })
+        }
 
         return apps
     }
@@ -46,6 +52,8 @@ export default class Home extends Component {
         const openTab = key === 1
             ? 'inProgress'
             : 'completed'
+
+
         const apps = this.changeTabs(openTab, this.props.user)
         
         this.setState({ 

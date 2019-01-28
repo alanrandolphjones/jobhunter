@@ -1,5 +1,5 @@
 // Require our user model soe we can create new users
-const { User, JobApp, Progress } = require('../models/User')
+const { User, JobApp, Progress, Interaction } = require('../models/User')
 
 // Create an array to store our fake users
 const users = []
@@ -33,8 +33,7 @@ const startup = new JobApp({
 })
 
 const startupProgress = new Progress({
-    applicationDate: Date('November 28 2018'),
-    state: "inProgress"
+    state: "unapplied",
 })
 
 startup.progress = startupProgress
@@ -48,13 +47,20 @@ const bigCorp = new JobApp({
     contactFirstName: "Bill",
     contactLastName: "Gates",
     postingUrl: 'http://www.linkedin.com/jobposting',
-    postDate: Date('November 14, 2018'),
+    postDate: new Date('November 14, 2018'),
 })
 
 const bigCorpProgress = new Progress({
-    applicationDate: Date('November 20 2018'),
-    firstFollowUp: Date('Novembet 27, 2018'),
-    state: "inProgress"
+    state: "applied",
+    applications: [
+        new Interaction({
+            interaction: new Date('January 15 2019'),
+            info: "email to recruiter",
+            followups: [
+                new Date("January 22 2019")
+            ]
+        })
+    ]
 })
 
 bigCorp.progress = bigCorpProgress
@@ -68,17 +74,21 @@ const dreamCompany = new JobApp({
     contactFirstName: "Jerry",
     contactLastName: "Dreamer",
     postingUrl: 'http://www.linkedin.com/jobposting2',
-    postDate: Date('November 1, 2018'),
+    postDate: new Date('November 1, 2018'),
 })
 
 const dreamCompanyProgress = new Progress({
-    applicationDate: Date('November 2, 2018'),
-    firstFollowUp: Date('November 9, 2018'),
-    response: "interview",
-    interviewDate: Date('December 10 2018'),
-    state: "inProgress",
-    interviewContact: 'CEO',
-    comments: "interview at Cool Office Building with lots of beanbags downtown."
+    state: "applied",
+    applications: [
+        new Interaction({
+            interaction: new Date('December 20 2018'),
+            followups: [
+                new Date("December 27 2018"),
+                new Date("January 4 2019"),
+                new Date("January 11 2019")
+            ]
+        })
+    ]
 })
 
 dreamCompany.progress = dreamCompanyProgress
@@ -92,21 +102,233 @@ const anotherJob = new JobApp({
     contactFirstName: "Some",
     contactLastName: "Recruiter",
     postingUrl: 'http://www.monster.com/jobposting',
-    postDate: Date('October 15, 2018'),
+    postDate: new Date('October 15, 2018'),
 })
 
 const anotherJobProgress = new Progress({
-    applicationDate: Date('October 17, 2018'),
-    firstFollowUp: Date('October 24, 2018'),
-    secondFollowUp: Date('November 2 2018'),
-    thirdFollowUp: Date('November 10, 2018'),
-    interviewDate: Date('December 10 2018'),
-    state: "completed",
+    state: "callback",
+    applications: [
+        new Interaction({
+            interaction: new Date('December 20 2018'),
+            followups: [
+                new Date("December 27 2018"),
+                new Date("January 4 2019"),
+                new Date("January 11 2019")
+            ],
+        })
+    ],
+    callbacks: [
+        new Interaction({
+            interaction: new Date("January 13 2019"),
+        })
+    ]
 })
 
 anotherJob.progress = anotherJobProgress
 
 alanJobApps.push(anotherJob)
+
+const fourthJob = new JobApp({
+    position: "Web Developer 4",
+    company: "Another Company Again",
+    contactEmail: "someguy@another.co",
+    contactFirstName: "Some",
+    contactLastName: "Recruiter",
+    postingUrl: 'http://www.monster.com/jobposting',
+    postDate: new Date('October 15, 2018'),
+})
+
+const fourthJobProgress = new Progress({
+    state: "callback",
+    applications: [
+        new Interaction({
+            interaction: new Date('December 2 2018'),
+            followups: [
+                new Date("December 9 2018"),
+                new Date("December 16 2018"),
+                new Date("December 17 2018")
+            ]
+        })
+    ],
+    callbacks: [
+        new Interaction({
+            date: new Date("December 20 2018"),
+        })
+    ]
+})
+
+fourthJob.progress = fourthJobProgress
+
+alanJobApps.push(fourthJob)
+
+const fifthJob = new JobApp({
+    position: "Web Developer 5",
+    company: "Another Company 5",
+    contactEmail: "5@another.co",
+    contactFirstName: "5",
+    contactLastName: "5",
+    postingUrl: 'http://www.monster.com/jobposting',
+    postDate: new Date('October 15, 2018'),
+})
+
+const fifthJobProgress = new Progress({
+    state: "interview",
+    applications: [
+        new Interaction({
+            interaction: new Date('December 2 2018'),
+            followups: [
+                new Date("December 9 2018"),
+                new Date("December 16 2018"),
+                new Date("December 17 2018")
+            ]
+        })
+    ],
+    callbacks: [
+        new Interaction({
+            interaction: new Date("December 20 2018"),
+        })
+    ],
+    interviews: [
+        new Interaction({
+            interaction: new Date("January 5 2019"),
+            followups: [
+                new Date("January 6 2019")
+            ]
+        })
+    ]
+})
+
+fifthJob.progress = fifthJobProgress
+
+alanJobApps.push(fifthJob)
+
+const rejectedJob = new JobApp({
+    position: "Rejected Developer 5",
+    company: "Rejected Company 5",
+    contactEmail: "Rejected@another.co",
+    contactFirstName: "Rejected",
+    contactLastName: "Rejected",
+    postingUrl: 'http://www.monster.com/jobposting',
+    postDate:new Date('October 15, 2018'),
+})
+
+const rejectedJobProgress = new Progress({
+    state: "rejected",
+    applications: [
+        new Interaction({
+            interaction: new Date('December 2 2018'),
+            followups: [
+                new Date("December 9 2018"),
+                new Date("December 16 2018"),
+                new Date("December 17 2018")
+            ]
+        })
+    ],
+    callbacks: [
+        new Interaction({
+            interaction: new Date("December 20 2018"),
+        })
+    ],
+    interviews: [
+        new Interaction({
+            interaction: new Date("January 5 2019"),
+            info: 'in person',
+            followups: [
+                new Date("January 6 2019")
+            ]
+        })
+    ] 
+})
+
+rejectedJob.progress = rejectedJobProgress
+
+alanJobApps.push(rejectedJob)
+
+const laterJob = new JobApp({
+    position: "Later Developer 5",
+    company: "Later Company 5",
+    contactEmail: "later@another.co",
+    contactFirstName: "Later",
+    contactLastName: "Later",
+    postingUrl: 'http://www.monster.com/jobposting',
+    postDate:new Date('October 15, 2018'),
+})
+
+const laterJobProgress = new Progress({
+    state: "keepInTouch",
+    applications: [
+        new Interaction({
+            interaction: new Date('December 2 2018'),
+            followups: [
+                new Date("December 9 2018"),
+                new Date("December 16 2018"),
+                new Date("December 17 2018")
+            ]
+        })
+    ],
+    callbacks: [
+        new Interaction({
+            interaction: new Date("December 20 2018"),
+        })
+    ],
+    interviews: [
+        new Interaction({
+            interaction: new Date("January 5 2019"),
+            info: "phone",
+            followups: [
+                new Date("January 6 2019")
+            ]
+        })
+    ],
+})
+
+laterJob.progress = laterJobProgress
+
+alanJobApps.push(laterJob)
+
+const acceptedJob = new JobApp({
+    position: "Accepted Developer 5",
+    company: "Accepted Company 5",
+    contactEmail: "Accepted@another.co",
+    contactFirstName: "Accepted",
+    contactLastName: "Accepted",
+    postingUrl: 'http://www.monster.com/jobposting',
+    postDate:new Date('October 15, 2018'),
+})
+
+const acceptedJobProgress = new Progress({
+    state: "accepted",
+
+    applications: [
+        new Interaction({
+            interaction: new Date('December 2 2018'),
+            followups: [
+                new Date("December 9 2018"),
+                new Date("December 16 2018"),
+                new Date("December 17 2018")
+            ]
+        })
+    ],
+    callbacks: [
+        new Interaction({
+            interaction: new Date("December 20 2018"),
+            followups: new Date("December 29 2018")
+        })
+    ],
+    interviews: [
+        new Interaction({
+            interaction: new Date("January 5 2019"),
+            info: 'in person',
+            followups: [
+                new Date("January 6 2019")
+            ]
+        })
+    ]
+})
+
+acceptedJob.progress = acceptedJobProgress
+
+alanJobApps.push(acceptedJob)
 
 alan.jobApps = alanJobApps
 

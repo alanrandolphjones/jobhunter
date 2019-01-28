@@ -58,7 +58,7 @@ export default class ComponentName extends Component {
             user.jobApps.push(jobApp)
         }
 
-        jobApp.progress.state = jobApp.progress.state ? jobApp.progress.state : 'inProgress'
+        jobApp.progress.state = jobApp.progress.state ? jobApp.progress.state : 'applied'
 
         try {
             await axios.put(`/users/${this.props.user._id}/jobApp`, {

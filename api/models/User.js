@@ -5,35 +5,21 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 // Define the schema
+
+const interactionSchema = new Schema({
+    interaction: Date,
+    info: String,
+    followups: [Date]
+})
+
 const progressSchema = new Schema({
-    applicationDate: {
-        type: Date
-    },
-    firstFollowUp: {
-        type: Date
-    },
-    secondFollowUp: {
-        type: Date
-    },
-    thirdFollowUp: {
-        type: Date
-    },
-    response: {
-        type: String
-    },
-    firstInterview: {
-        type: Date
-    },
-    interviewContact: {
-        type: String
-    },
-    comments: {
-        type: String
-    },
     state: {
         type: String,
-        default: 'inProgress'
-    }
+        default: 'applied',
+    },
+    applications: [interactionSchema],
+    callbacks: [interactionSchema],
+    interviews: [interactionSchema],
 })
 
 const jobAppSchema = new Schema({
@@ -95,5 +81,6 @@ const userSchema = new Schema({
 module.exports = {
     User: mongoose.model('User', userSchema),
     JobApp: mongoose.model('JobApp', jobAppSchema),
-    Progress: mongoose.model('Progress', progressSchema)
+    Progress: mongoose.model('Progress', progressSchema),
+    Interaction: mongoose.model('Interaction', interactionSchema)
 }
