@@ -31,8 +31,6 @@ export default class JobApp extends Component {
     componentDidMount() {
 
         const appProperties = this.getAppProperties()
-        // const progress = this.getAppProgress()
-        // const nextActionDate = this.getNextActionDate(progress) || new Date()
         
         this.setState({
             appProperties,
@@ -174,6 +172,11 @@ export default class JobApp extends Component {
                             <Progress
                                 progress={this.props.app.progress}
                                 getDateString={this.getDateString}
+                                handleClose={this.handleClose}
+                                properties={this.props.app}
+                                user={this.props.user}
+                                getUserData={this.props.getUserData}
+                                jobApp={this.props.app}
                             >
 
                             </Progress>

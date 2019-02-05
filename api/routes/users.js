@@ -1,7 +1,7 @@
 const express = require('express')
 const Router = express.Router
 const router = Router()
-const { User, JobApp } = require('../models/User')
+const { User } = require('../models/User')
 
 // GET /users
 router.get('/', async (req, res, next) => {

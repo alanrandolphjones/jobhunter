@@ -135,7 +135,7 @@ const fourthJob = new JobApp({
     contactFirstName: "Some",
     contactLastName: "Recruiter",
     postingUrl: 'http://www.monster.com/jobposting',
-    postDate: new Date('October 15, 2018'),
+    postDate: new Date('October 15 2018'),
 })
 
 const fourthJobProgress = new Progress({
@@ -152,7 +152,7 @@ const fourthJobProgress = new Progress({
     ],
     callbacks: [
         new Interaction({
-            date: new Date("December 20 2018"),
+            interaction: new Date("December 20 2018"),
         })
     ]
 })

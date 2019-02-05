@@ -35,13 +35,22 @@ export default class Home extends Component {
         let allApps = user.jobApps
         let apps = []
         if (openTab === 'completed') {
-            allApps.forEach(app => {            
-                if (app.progress.state === openTab) apps.push(app)
+            allApps.forEach(app => {
+                if (app.progress.state === 'rejected' 
+                || app.progress.state === 'accepted' 
+                || app.progress.state === 'keepInTouch') {
+                    apps.push(app)
+                }
             })
         } else {
             allApps.forEach(app => {
-                console.log(app)
-                if (app.progress.state !== 'completed') apps.push(app)
+                if (app.progress.state === 'unapplied' 
+                || app.progress.state === 'applied' 
+                || app.progress.state === 'callback' 
+                || app.progress.state === 'waitingForInterview' 
+                || app.progress.state === 'interview') {
+                    apps.push(app)
+                }
             })
         }
 

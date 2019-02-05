@@ -46,14 +46,11 @@ export default class ComponentName extends Component {
 
         if (jobApp._id) {
             user.jobApps = user.jobApps.map(function(app) {
-                console.log(app._id)
-                console.log(jobApp._id)
                 if (app._id === jobApp._id) {
                     app = jobApp
                 }
                 return app
             })
-            console.log(user)
         } else {
             user.jobApps.push(jobApp)
         }
