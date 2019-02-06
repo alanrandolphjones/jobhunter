@@ -15,7 +15,7 @@ export default class Progress extends Component {
             lastActionDate: null
         }
 
-        this.changeStatus = this.changeStatus.bind(this)
+        this.addInteraction = this.addInteraction.bind(this)
         this.updateDatabase = this.updateDatabase.bind(this)
         this.addFollowup = this.addFollowup.bind(this)
         this.handleProgressClose = this.handleProgressClose.bind(this);
@@ -161,19 +161,20 @@ export default class Progress extends Component {
         }
     }
 
-    changeStatus(date) {
-
-        console.log(date)
-
-        //Get progress from state
+    addInteraction(date, interaction, newStatus) {
         const progress = this.state.progress
-
-        //Update progress
-        progress.state = 'applied'
-
+        progress.state = newStatus
         const app = {}
         app.interaction = date
-        progress.applications.push(app)
+        progress[interaction].push(app)
+
+        const lastActionDate = date
+        const nextActionDate = this.getNextActionDate(lastActionDate)
+
+        this.setState({
+            nextActionDate,
+            lastActionDate
+        })
 
         this.updateDatabase(progress)
     }
@@ -220,7 +221,8 @@ export default class Progress extends Component {
                         handleChangeStatusClose={this.handleChangeStatusClose}
                         lastActionDate={this.state.lastActionDate}
                         getDateString={this.props.getDateString}
-                        changeStatus={this.changeStatus}
+                        addInteraction={this.addInteraction}
+                        state={this.state.progress.state}
                     ></ChangeStatusPopup>
                 </Modal>
                 <Table>
@@ -239,6 +241,18 @@ export default class Progress extends Component {
         if (this.state.progress.state !== 'unapplied') return (
             <>
             <Modal
+                show={this.state.changeStatusShow}
+                onHide={this.handleChangeStatusClose}
+            >
+                <ChangeStatusPopup
+                    handleChangeStatusClose={this.handleChangeStatusClose}
+                    lastActionDate={this.state.lastActionDate}
+                    getDateString={this.props.getDateString}
+                    addInteraction={this.addInteraction}
+                    state={this.state.progress.state}
+                ></ChangeStatusPopup>
+            </Modal>
+            <Modal
                 show={this.state.progressShow}
                 onHide={this.handleProgressClose}
             >
@@ -256,7 +270,7 @@ export default class Progress extends Component {
                         {this.state.progress.state === 'applied' && this.state.nextActionDate ? 
                             <>
                                 <th>{`If you don't hear from a recruiter, send a followup email on ${this.props.getDateString(this.state.nextActionDate)}`}</th>
-                                <th><Button bsStyle="success" bsSize="small">I heard back!</Button></th>
+                                    <th><Button bsStyle="success" bsSize="small" onClick={this.handleChangeStatusShow}>I heard back!</Button></th>
                             </>
                         : null}
                         {this.state.progress.state === 'applied' && !this.state.nextActionDate ? 

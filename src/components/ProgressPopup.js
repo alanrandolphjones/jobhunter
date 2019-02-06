@@ -34,6 +34,8 @@ export default class ProgressPopup extends Component {
         const dates = []
         const lastActionDate = this.props.lastActionDate
 
+        console.log(lastActionDate)
+
         if (!lastActionDate) return false
         const diffDays = this.getDiffDays(lastActionDate, today)
 

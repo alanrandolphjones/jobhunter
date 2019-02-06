@@ -21,7 +21,7 @@ export default class JobApp extends Component {
     }
 
     handleClose() {
-        this.setState({ show: false });
+        if (this.state.show === true) this.setState({ show: false });
     }
 
     handleShow() {
