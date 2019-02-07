@@ -16,10 +16,12 @@ export default class ChangeStatusPopup extends Component {
         this.handleChange = this.handleChange.bind(this)
         this.submitChange = this.submitChange.bind(this)
         this.unappliedToApplied = this.unappliedToApplied.bind(this)
-        this.appliedToInterview = this. appliedToInterview.bind(this)
-        this.appliedToCallback = this.appliedToCallback.bind(this)
-        this.appliedToKeepInTouch = this.appliedToKeepInTouch.bind(this)
+        this.toInterview = this. toInterview.bind(this)
+        this.toCallback = this.toCallback.bind(this)
+        this.toKeepInTouch = this.toKeepInTouch.bind(this)
         this.setInterviewDate = this.setInterviewDate.bind(this)
+        this.toAccepted = this.toAccepted.bind(this)
+        this.toRejected = this.toRejected.bind(this)
     }
 
     handleChange(event) {
@@ -58,7 +60,7 @@ export default class ChangeStatusPopup extends Component {
         this.submitChange(date, 'applications', 'applied')
     }
 
-    appliedToInterview() {
+    toInterview() {
         console.log('applied to intervire')
         const date = this.state.dates[this.state.selectedDate]
         this.props.addInteraction(date, 'callbacks', 'callback')
@@ -90,16 +92,28 @@ export default class ChangeStatusPopup extends Component {
         this.submitChange(interviewDate, 'interviews', 'waitingForInterview')
     }
 
-    appliedToCallback(e) {
+    toCallback(e) {
         e.preventDefault()
         const date = this.state.dates[this.state.selectedDate]
         this.submitChange(date, 'callbacks', 'callback')
     }
 
-    appliedToKeepInTouch(e) {
+    toKeepInTouch(e) {
         e.preventDefault()
         const date = this.state.dates[this.state.selectedDate]
         this.submitChange(date, 'callbacks', 'keepInTouch')        
+    }
+
+    toAccepted(e) {
+        e.preventDefault()
+        const date = this.state.dates[this.state.selectedDate]
+        this.submitChange(date, 'callbacks', 'accepted')
+    }
+
+    toRejected(e) {
+        e.preventDefault()
+        const date = this.state.dates[this.state.selectedDate]
+        this.submitChange(date, 'callbacks', 'rejected')
     }
 
     submitChange(date, interactionType, newStatus) {
@@ -130,7 +144,7 @@ export default class ChangeStatusPopup extends Component {
             </>
         )
 
-        if (this.props.state === 'applied' && this.state.interactionType !== 'interviews') return (
+        if (this.props.state === 'applied' || this.props.state === 'callback'&& this.state.interactionType !== 'interviews') return (
             <>
                 <Modal.Header closeButton>
                 </Modal.Header>
@@ -144,9 +158,9 @@ export default class ChangeStatusPopup extends Component {
                             </select>
                         </div>
                     <Modal.Title>What did they say?</Modal.Title>                    
-                        <Button type="submit" bsStyle="success" onClick={this.appliedToInterview}>I got an interview!</Button>
-                        <Button type="submit" bsStyle="danger" onClick={this.appliedToKeepInTouch}>I didn't get the job</Button>
-                        <Button type="submit" bsStyle="warning" onClick={this.appliedToCallback}>They'll reach out again soon</Button>
+                        <Button type="submit" bsStyle="success" onClick={this.toInterview}>I got an interview!</Button>
+                        <Button type="submit" bsStyle="danger" onClick={this.toKeepInTouch}>I didn't get the job</Button>
+                        <Button type="submit" bsStyle="warning" onClick={this.toCallback}>They'll reach out again soon</Button>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button onClick={this.props.handleChangeStatusClose}>Close</Button>
@@ -154,7 +168,7 @@ export default class ChangeStatusPopup extends Component {
             </>
         )
 
-        if (this.props.state === 'applied' && this.state.interactionType === 'interviews') return (
+        if (this.props.state === 'applied' || this.props.state === 'callback' && this.state.interactionType === 'interviews') return (
             <>
             <Modal.Header closeButton>
                 <Modal.Title>When is the interview?</Modal.Title>
@@ -172,6 +186,30 @@ export default class ChangeStatusPopup extends Component {
             <Modal.Footer>
                 <Button onClick={this.props.handleChangeStatusClose}>Close</Button>
             </Modal.Footer>
+            </>
+        )
+
+        if (this.props.state === 'interview') return (
+            <>
+                <Modal.Header closeButton>
+                </Modal.Header>
+                <Modal.Body>
+                    <Modal.Title>When did you hear back?</Modal.Title>
+                    <div>
+                        <select name="" id="selectedDate" value={this.state.selectedDate} onChange={this.handleChange}>
+                            {this.state.dates.map((date, i) => {
+                                return <option key={i} value={i}>{this.props.getDateString(date)}</option>
+                            })}
+                        </select>
+                    </div>
+                    <Modal.Title>What did they say?</Modal.Title>
+                    <Button type="submit" bsStyle="success" onClick={this.toAccepted}>I got an job!</Button>
+                    <Button type="submit" bsStyle="danger" onClick={this.toRejected}>I didn't get the job</Button>
+                    <Button type="submit" bsStyle="warning" onClick={this.toKeepInTouch}>They told me to try again soon.</Button>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button onClick={this.props.handleChangeStatusClose}>Close</Button>
+                </Modal.Footer>
             </>
         )
 

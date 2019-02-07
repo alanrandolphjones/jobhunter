@@ -22,6 +22,7 @@ export default class Progress extends Component {
         this.handleProgressShow = this.handleProgressShow.bind(this);
         this.handleChangeStatusClose = this.handleChangeStatusClose.bind(this)
         this.handleChangeStatusShow = this.handleChangeStatusShow.bind(this)
+        this.changeStatus = this.changeStatus.bind(this)
     }
 
     handleProgressClose() {
@@ -44,14 +45,14 @@ export default class Progress extends Component {
 
         const progress = this.convertDateObjects(this.props.progress)
         const lastActionDate = this.getLastActionDate(progress)
-        const nextActionDate = this.getNextActionDate(lastActionDate)
+        const nextActionDate = this.getNextActionDate(lastActionDate, progress)
 
         this.setState({
             progress,
             lastActionDate,
             nextActionDate,
         })
-    }
+    } 
 
     interviewUpcoming(interviews) {
         const lastInterview = interviews[interviews.length - 1]
@@ -64,33 +65,29 @@ export default class Progress extends Component {
         }
     }
 
-    getLastActionDate(progress) {
-
-        console.log(progress)
-        
+    getLastActionDate(progress) {        
         let lastActionDate
 
         const state = progress.state
 
-        if (state === 'applied' || state === 'callback' || state === 'interviewed') {
+        if (state === 'applied' || state === 'callback' || state === 'interview' || state === 'waitingForInterview') {
 
             let lastResponse
 
             if (state === 'applied') lastResponse = progress.applications[progress.applications.length - 1]
-            if (state === 'callback') lastResponse = progress.callbacks[progress.callbacks.length - 1]
-            if (state === 'interviewed') lastResponse = progress.interviews[progress.interviews.length - 1]
+            if (state === 'callback' || state === 'waitingForInterview') lastResponse = progress.callbacks[progress.callbacks.length - 1]
+            if (state === 'interview') lastResponse = progress.interviews[progress.interviews.length - 1]
 
             lastActionDate =
                 lastResponse.followups.length > 0 ?
                     lastResponse.followups[lastResponse.followups.length - 1] :
                     lastResponse.interaction
 
-            console.log(lastActionDate)
         }
         return lastActionDate
     }
 
-    getNextActionDate(lastActionDate) {
+    getNextActionDate(lastActionDate, progress) {
 
         let nextActionDate
 
@@ -106,8 +103,22 @@ export default class Progress extends Component {
             if (nextActionDate <= now) {
                 return false
             }
-            return nextActionDate
+            
         }
+
+        if (progress && progress.state === 'waitingForInterview') {
+            const lastInterview = progress.interviews[progress.interviews.length - 1]
+
+            nextActionDate = lastInterview.followups > 0 ?
+                lastInterview.followups[lastInterview.followups.length - 1] :
+                lastInterview.interaction 
+            
+            const now = new Date()
+            if (nextActionDate <= now) {
+                return false
+            }
+        }
+        return nextActionDate
     }
 
     convertDateObjects(appProgress) {
@@ -161,6 +172,13 @@ export default class Progress extends Component {
         }
     }
 
+    changeStatus(newStatus) {
+        const progress = this.state.progress
+        progress.state = newStatus
+
+        this.updateDatabase(progress)
+    }
+
     addInteraction(date, interaction, newStatus) {
         const progress = this.state.progress
         progress.state = newStatus
@@ -187,7 +205,7 @@ export default class Progress extends Component {
 
         if (state === 'applied') lastResponse = progress.applications[progress.applications.length - 1]
         if (state === 'callback') lastResponse = progress.callbacks[progress.callbacks.length - 1]
-        if (state === 'interviewed') lastResponse = progress.interviews[progress.interviews.length - 1]
+        if (state === 'interview') lastResponse = progress.interviews[progress.interviews.length - 1]
 
         //Add new followup to array
         lastResponse.followups.push(followup)
@@ -291,29 +309,29 @@ export default class Progress extends Component {
                                     <th><Button bsStyle="success" bsSize="small" onClick={this.handleProgressShow}>Done! What's next?</Button></th>
                             </>
                         : null}
-                            {this.state.progress.state === 'interview' && this.state.nextActionDate && !this.state.interviewUpcoming ?
+                            {this.state.progress.state === 'interview' && this.state.nextActionDate ?
                             <>
                                 <th>{`If you don't hear from them again soon, send a followup email on ${this.props.getDateString(this.state.nextActionDate)}`}</th>
-                                    <th><Button bsStyle="success" bsSize="small" onClick={this.handleProgressShow}>I heard back!</Button></th>
+                                    <th><Button bsStyle="success" bsSize="small" onClick={this.handleChangeStatusShow}>I heard back!</Button></th>
                             </>
                         : null}
-                        {this.state.progress.state === 'interview' && !this.state.nextActionDate && !this.state.interviewUpcoming ?
+                        {this.state.progress.state === 'interview' && !this.state.nextActionDate ?
                             <>
                                 <th>Haven't heard back? Send a followup email!</th>
-                                <th><Button bsStyle="success" bsSize="small">Done! What's next?</Button></th>
+                                    <th><Button bsStyle="success" bsSize="small" onClick={this.handleProgressShow}>Done! What's next?</Button></th>
                             </>
                         : null}
-                            {this.state.progress.state === 'waitingForInterview' && this.stateNextAction ? 
+                        {this.state.progress.state === 'waitingForInterview' && this.state.nextActionDate ? 
                             <>
-                                <th>{`You have an interview on ${this.props.getDateString(this.state.interviewUpcoming)}`}</th>
+                                    <th>{`You have an interview on ${this.props.getDateString(this.state.nextActionDate)}`}</th>
                             </>
                         : null}
-                        {this.state.progress.state === 'waitingForInterview' && this.stateNextAction ?
+                        {/* {this.state.progress.state === 'waitingForInterview' && !this.state.nextActionDate ?
                             <>
                                 <th>How did your interview go?</th>
                                 <th><Button bsStyle="success" bsSize="small">Tell us how it went!</Button></th>
                             </>
-                        : null}
+                        : null} */}
                     </tr>
                 </thead>
             </Table>

@@ -34,8 +34,6 @@ export default class ProgressPopup extends Component {
         const dates = []
         const lastActionDate = this.props.lastActionDate
 
-        console.log(lastActionDate)
-
         if (!lastActionDate) return false
         const diffDays = this.getDiffDays(lastActionDate, today)
 
@@ -47,14 +45,15 @@ export default class ProgressPopup extends Component {
             
             dates.push(newDate)
         }
-
         const selectedDate = dates.length - 1
-
 
         this.setState({
             selectedDate,
             dates
         })
+    }
+
+    autoUpdate() {
 
     }
 
