@@ -2,6 +2,7 @@ const express = require('express')
 const Router = express.Router
 const router = Router()
 const { User } = require('../models/User')
+const schedule = require('node-schedule');
 
 // GET /users
 router.get('/', async (req, res, next) => {
@@ -38,8 +39,6 @@ router.get('/:user_id', async (req, res, next) => {
 
 router.put('/:user_id/jobApp', async (req, res) => {
 
-    
-
     const user = new User(req.body.user)
 
     User.findByIdAndUpdate(
@@ -54,16 +53,64 @@ router.put('/:user_id/jobApp', async (req, res) => {
 
             res.status(500).json({ message: err.message });
         });
-
-
-    // user.jobApps.push(jobApp)
-
-    //Currently getting error because of duplicate IDs. Is there a way to alter data instead of replacing? https://stackoverflow.com/questions/45539709/how-to-update-only-some-properties-of-object-in-mongodb-database
-    
-    // user.save()
-        
      
 })
+
+daysBetween = function (date1, date2) {
+    //Get 1 day in milliseconds
+    var one_day = 1000 * 60 * 60 * 24;
+
+    // Convert both dates to milliseconds
+    var date1_ms = date1.getTime();
+    var date2_ms = date2.getTime();
+
+    // Calculate the difference in milliseconds
+    var difference_ms = date2_ms - date1_ms;
+
+    // Convert back to days and return
+    return Math.round(difference_ms / one_day);
+}
+
+dailyUpdate = () => {
+
+    User.find({}).then((users) => {
+        //Loop through users
+        users.forEach((user) => {
+            //Loop through job apps and find ones which have been left alone too long
+            user.jobApps = user.jobApps.map((app) => {
+                const interactions = app.progress.interactions
+                const lastInteraction = interactions[interactions.length - 1]
+                if (interactions.length > 0) {
+                    const followups = lastInteraction.followups
+                    if (followups.length > 0) {
+                        const lastFollowup = followups[followups.length - 1]
+                        const dateDiff = daysBetween(lastFollowup, new Date())
+                        //Change status if there is nothing left for user to do
+                        if (followups.length >= 3 && dateDiff > 7) {
+                            app.progress.status = 'rejected'
+                        }
+                    }
+                }
+
+                return app
+
+            })
+            //Save new user profile to db
+            User.findByIdAndUpdate(
+                user._id,
+                {$set: user}
+            ).then((doc) => {
+                console.log('data updated')
+            })
+
+        })
+    })
+}
+
+//Scheduled daily update at midnight
+const update = schedule.scheduleJob({hour: 21, minute: 49}, function () {
+    dailyUpdate()
+});
 
 // Export router so that it is available to our server
 module.exports = router

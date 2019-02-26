@@ -18,6 +18,7 @@ class App extends Component {
   getUserData = async () => {
     const res = await axios.get('/users')
     const user = res.data.data[1]
+    console.log(user)
     this.setState({
       user
     })

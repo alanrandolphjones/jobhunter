@@ -12,7 +12,8 @@ export default class Progress extends Component {
             progress: null,
             nextActionDate: null,
             progressShow: false,
-            lastActionDate: null
+            lastActionDate: null,
+            almostDone: false,
         }
 
         this.addInteraction = this.addInteraction.bind(this)
@@ -42,47 +43,70 @@ export default class Progress extends Component {
     }
 
     componentDidMount() {
-
         const progress = this.convertDateObjects(this.props.progress)
+        const almostDone = this.isItAlmostDone(progress)
+        let inProgress
+
+        const status = progress.status
+        if (status === 'applied' || status === 'callback' || status === 'interview' || status === 'waitingForInterview') {
+            inProgress = true
+        } else {
+            inProgress = false
+        }
+
         const lastActionDate = this.getLastActionDate(progress)
         const nextActionDate = this.getNextActionDate(lastActionDate, progress)
+        
+        if (inProgress && almostDone && !nextActionDate) {
+            progress.status = 'rejected'
+        }
 
         this.setState({
             progress,
             lastActionDate,
             nextActionDate,
+            almostDone
         })
-    } 
-
-    interviewUpcoming(interviews) {
-        const lastInterview = interviews[interviews.length - 1]
-
-        if (lastInterview.followups.length === 0) {
-            const now = new Date()
-            if (lastInterview.interaction <= now) {
-                return lastInterview.interaction
-            } 
-        }
     }
+
+    isItAlmostDone(progress) {
+
+        const status = progress.status
+        if (status === 'applied' || status === 'callback' || status === 'interview') {
+            let lastResponse
+            lastResponse = progress.interactions[progress.interactions.length - 1]
+
+            if (lastResponse.followups.length === 3) return true
+        }
+
+        return false
+    }
+
+
+    // interviewUpcoming(interactions) {
+    //     let lastInterview
+    //     //Gets the last interaction in the array that has type 'interview'
+    //     interactions.forEach((interaction) => {
+    //         if (interaction.kind = 'interview') {
+    //             lastInterview = interaction
+    //         }
+    //     })
+    //     return lastInterview
+    // }
 
     getLastActionDate(progress) {        
         let lastActionDate
 
-        const state = progress.state
+        const status = progress.status
 
-        if (state === 'applied' || state === 'callback' || state === 'interview' || state === 'waitingForInterview') {
-
+        if (status === 'applied' || status === 'callback' || status === 'interview' || status === 'waitingForInterview') {
             let lastResponse
-
-            if (state === 'applied') lastResponse = progress.applications[progress.applications.length - 1]
-            if (state === 'callback' || state === 'waitingForInterview') lastResponse = progress.callbacks[progress.callbacks.length - 1]
-            if (state === 'interview') lastResponse = progress.interviews[progress.interviews.length - 1]
+            lastResponse = progress.interactions[progress.interactions.length - 1]
 
             lastActionDate =
                 lastResponse.followups.length > 0 ?
                     lastResponse.followups[lastResponse.followups.length - 1] :
-                    lastResponse.interaction
-
+                    lastResponse.date
         }
         return lastActionDate
     }
@@ -106,12 +130,12 @@ export default class Progress extends Component {
             
         }
 
-        if (progress && progress.state === 'waitingForInterview') {
-            const lastInterview = progress.interviews[progress.interviews.length - 1]
+        if (progress && progress.status === 'waitingForInterview') {
+            const lastInterview = progress.interactions[progress.interactions.length - 1]
 
             nextActionDate = lastInterview.followups > 0 ?
                 lastInterview.followups[lastInterview.followups.length - 1] :
-                lastInterview.interaction 
+                lastInterview.date 
             
             const now = new Date()
             if (nextActionDate <= now) {
@@ -124,9 +148,9 @@ export default class Progress extends Component {
     convertDateObjects(appProgress) {
         // //Convert dates to JS Date objects
         for (let key in appProgress) {
-            if (key !== 'state' && key !== '_id') {
+            if (key !== 'status' && key !== '_id') {
                 appProgress[key] = appProgress[key].map((property) => {
-                    property.interaction = new Date(property.interaction)
+                    property.date = new Date(property.date)
                     property.followups = property.followups.map((followup) => {
                         return new Date(followup)
                     })
@@ -138,8 +162,6 @@ export default class Progress extends Component {
     }
 
     async updateDatabase(progress) {
-
-        console.log(progress)
         //Get jobApp from props
         const jobApp = this.props.jobApp
 
@@ -174,17 +196,18 @@ export default class Progress extends Component {
 
     changeStatus(newStatus) {
         const progress = this.state.progress
-        progress.state = newStatus
+        progress.status = newStatus
 
         this.updateDatabase(progress)
     }
 
-    addInteraction(date, interaction, newStatus) {
+    addInteraction(date, interactionType, newStatus) {
         const progress = this.state.progress
-        progress.state = newStatus
+        progress.status = newStatus
         const app = {}
-        app.interaction = date
-        progress[interaction].push(app)
+        app.date = date
+        app.kind = interactionType
+        progress.interactions.push(app)
 
         const lastActionDate = date
         const nextActionDate = this.getNextActionDate(lastActionDate)
@@ -200,12 +223,8 @@ export default class Progress extends Component {
     addFollowup(followup) {
         //Get Progress
         const progress = this.state.progress
-        const state = progress.state
-        let lastResponse
-
-        if (state === 'applied') lastResponse = progress.applications[progress.applications.length - 1]
-        if (state === 'callback') lastResponse = progress.callbacks[progress.callbacks.length - 1]
-        if (state === 'interview') lastResponse = progress.interviews[progress.interviews.length - 1]
+        const status = progress.status
+        const lastResponse = progress.interactions[progress.interactions.length - 1]
 
         //Add new followup to array
         lastResponse.followups.push(followup)
@@ -222,14 +241,10 @@ export default class Progress extends Component {
         this.updateDatabase(progress)
     }
 
-    responsePopup() {
-        //Display popup to log response from employer (rejection, interview, acceptance)
-    }
-
     render() {
         if (!this.state.progress) return <p>Data Missing</p>
 
-        if (this.state.progress.state === 'unapplied') return (
+        if (this.state.progress.status === 'unapplied') return (
                 <>
                 <Modal
                     show={this.state.changeStatusShow}
@@ -240,7 +255,7 @@ export default class Progress extends Component {
                         lastActionDate={this.state.lastActionDate}
                         getDateString={this.props.getDateString}
                         addInteraction={this.addInteraction}
-                        state={this.state.progress.state}
+                        status={this.state.progress.status}
                     ></ChangeStatusPopup>
                 </Modal>
                 <Table>
@@ -256,7 +271,7 @@ export default class Progress extends Component {
                 </>
             )
 
-        if (this.state.progress.state !== 'unapplied') return (
+        if (this.state.progress.status !== 'unapplied') return (
             <>
             <Modal
                 show={this.state.changeStatusShow}
@@ -267,7 +282,7 @@ export default class Progress extends Component {
                     lastActionDate={this.state.lastActionDate}
                     getDateString={this.props.getDateString}
                     addInteraction={this.addInteraction}
-                    state={this.state.progress.state}
+                    status={this.state.progress.status}
                 ></ChangeStatusPopup>
             </Modal>
             <Modal
@@ -285,138 +300,150 @@ export default class Progress extends Component {
                 <thead>
                     <tr>
                         <th>Next Steps:</th>
-                        {this.state.progress.state === 'applied' && this.state.nextActionDate ? 
+
+                        {this.state.progress.status === 'applied' && this.state.nextActionDate && !this.state.almostDone ? 
                             <>
                                 <th>{`If you don't hear from a recruiter, send a followup email on ${this.props.getDateString(this.state.nextActionDate)}`}</th>
                                     <th><Button bsStyle="success" bsSize="small" onClick={this.handleChangeStatusShow}>I heard back!</Button></th>
                             </>
                         : null}
-                        {this.state.progress.state === 'applied' && !this.state.nextActionDate ? 
+
+                        {this.state.progress.status === 'applied' && !this.state.nextActionDate && !this.state.almostDone ? 
                             <>
                                 <th>Haven't heard back? Send a followup email!</th>
                                 <th><Button bsStyle="success" bsSize="small" onClick={this.handleProgressShow}>Done! What's next?</Button></th>
                             </>
                         : null}
-                        {this.state.progress.state === 'callback' && this.state.nextActionDate ?
+
+                        {this.state.progress.status === 'applied' && this.state.nextActionDate && this.state.almostDone ?
                             <>
-                                <th>{`If you don't hear from them again soon, send a followup email on ${this.props.getDateString(this.state.nextActionDate)}`}</th>
-                                    <th><Button bsStyle="success" bsSize="small">I heard back!</Button></th>
+                                <th colSpan="2">{`If you don't hear from a recruiter by ${this.props.getDateString(this.state.nextActionDate)}, you should move on`}</th>
                             </>
                         : null}
-                        {this.state.progress.state === 'callback' && !this.state.nextActionDate ?
+
+                        {this.state.progress.status === 'callback' && this.state.nextActionDate && !this.state.almostDone  ?
+                            <>
+                                <th>{`If you don't hear from them again soon, send a followup email on ${this.props.getDateString(this.state.nextActionDate)}`}</th>
+                                <th><Button bsStyle="success" bsSize="small" onClick={this.handleChangeStatusShow}>I heard back!</Button></th>
+                            </>
+                        : null}
+
+                        {this.state.progress.status === 'callback' && !this.state.nextActionDate && !this.state.almostDone  ?
                             <>
                                 <th>Haven't heard back? Send a followup email!</th>
                                     <th><Button bsStyle="success" bsSize="small" onClick={this.handleProgressShow}>Done! What's next?</Button></th>
                             </>
                         : null}
-                            {this.state.progress.state === 'interview' && this.state.nextActionDate ?
+
+                        {this.state.progress.status === 'callback' && this.state.nextActionDate && this.state.almostDone ?
                             <>
-                                <th>{`If you don't hear from them again soon, send a followup email on ${this.props.getDateString(this.state.nextActionDate)}`}</th>
-                                    <th><Button bsStyle="success" bsSize="small" onClick={this.handleChangeStatusShow}>I heard back!</Button></th>
+                                <th colspan="2">{`If you don't hear from them by ${this.props.getDateString(this.state.nextActionDate)}, you should move on`}</th>
                             </>
                         : null}
-                        {this.state.progress.state === 'interview' && !this.state.nextActionDate ?
+
+                        {this.state.progress.status === 'interview' && this.state.nextActionDate && !this.state.almostDone  ?
+                            <>
+                                <th>{`If you don't hear from them again soon, send a followup email on ${this.props.getDateString(this.state.nextActionDate)}`}</th>
+                                <th><Button bsStyle="success" bsSize="small" onClick={this.handleChangeStatusShow}>I heard back!</Button></th>
+                            </>
+                        : null}
+
+                        {this.state.progress.status === 'interview' && !this.state.nextActionDate && !this.state.almostDone  ?
                             <>
                                 <th>Haven't heard back? Send a followup email!</th>
                                     <th><Button bsStyle="success" bsSize="small" onClick={this.handleProgressShow}>Done! What's next?</Button></th>
                             </>
                         : null}
-                        {this.state.progress.state === 'waitingForInterview' && this.state.nextActionDate ? 
+
+                        {this.state.progress.status === 'interview' && this.state.nextActionDate && this.state.almostDone ?
+                            <>
+                                <th colspan="2">{`If you don't hear back from them by ${this.props.getDateString(this.state.nextActionDate)}, you should move on`}</th>
+                            </>
+                        : null}
+
+                        {this.state.progress.status === 'waitingForInterview' && this.state.nextActionDate ?
                             <>
                                     <th>{`You have an interview on ${this.props.getDateString(this.state.nextActionDate)}`}</th>
                             </>
                         : null}
-                        {/* {this.state.progress.state === 'waitingForInterview' && !this.state.nextActionDate ?
-                            <>
-                                <th>How did your interview go?</th>
-                                <th><Button bsStyle="success" bsSize="small">Tell us how it went!</Button></th>
-                            </>
-                        : null} */}
                     </tr>
                 </thead>
             </Table>
             <Table bordered responsive key="key">
                 <tbody>
-                    {this.state.progress.applications.map((app, i) => {
+                    {this.state.progress.interactions.map((app, i) => {
                         const jsxObject = []
-
-                        const interaction = (
-                            <tr key={i}>
-                                <th>Applied on:</th>
-                                <th>{this.props.getDateString(app.interaction)}</th>
-                                <th>[Check]</th>
-                            </tr>
-                        )
-
-                        jsxObject.push(interaction)
-
-                        const followups = app.followups ? app.followups.map((followup, j) => {
-                            return (
-                                <tr key={j}>
-                                    <td>{`Followup #${j + 1} to application:`}</td>
-                                    <td>{this.props.getDateString(followup)}</td>
-                                    <td>[Check]</td>
-                                </tr>
-                            )
-                        }) : null
-                                                
-                        jsxObject.push(followups)
+                        let interaction
+                        let followups
                         
-                        return jsxObject
-                    })}
-                    {this.state.progress.callbacks.map((callback, i) => {
-
-                        const jsxObject = []
-
-                        const interaction = (
-                            <tr key={i}>
-                                <th>Heard from them on:</th>
-                                <th>{this.props.getDateString(callback.interaction)}</th>
-                                <th>[Check]</th>
-                            </tr>
-                        )
-
-                        jsxObject.push(interaction)
-
-                        const followups = callback.followups ? callback.followups.map((followup, j) => {
-                            return (
-                                <tr key={j}>
-                                    <td>{`Followup #${j + 1}:`}</td>
-                                    <td>{this.props.getDateString(followup)}</td>
-                                    <td>[Check]</td>
-                                </tr>
-                            )
-                        }) :  null
-
-                        jsxObject.push(followups)
-
-                        return jsxObject
-                    })}
-                    {this.state.progress.interviews.map((interview, i) => {
-
-                        const jsxObject = []
-
-                        const interaction = (
-                            <tr key={i}>
-                                <th>Scheduled an interview on:</th>
-                                <th>{this.props.getDateString(interview.interaction)}</th>
-                                <th>[Check]</th>
-                            </tr>
-                        )
-
-                        jsxObject.push(interaction)
-
-                        const followups = interview.followups ? interview.followups.map((followup, j) => {
-                            return (
+                        if (app.kind === 'application') {
+                            interaction = (
                                 <tr key={i}>
-                                    <td>{`Followup #${j + 1} to interview:`}</td>
-                                    <td>{this.props.getDateString(followup)}</td>
-                                    <td>[Check]</td>
+                                    <th>Applied on:</th>
+                                    <th>{this.props.getDateString(app.date)}</th>
+                                    <th>[Check]</th>
                                 </tr>
                             )
-                        }) :  null
+                            jsxObject.push(interaction)
+    
+                            followups = app.followups ? app.followups.map((followup, j) => {
+                                return (
+                                    <tr key={j}>
+                                        <td>{`Followup #${j + 1} to application:`}</td>
+                                        <td>{this.props.getDateString(followup)}</td>
+                                        <td>[Check]</td>
+                                    </tr>
+                                )
+                            }) : null
+                                                    
+                            jsxObject.push(followups)
+                        }
 
-                        jsxObject.push(followups)
+                        if (app.kind === 'callback') {
+                            interaction = (
+                                <tr key={i}>
+                                    <th>Heard back from them on:</th>
+                                    <th>{this.props.getDateString(app.date)}</th>
+                                    <th>[Check]</th>
+                                </tr>
+                            )
+                            jsxObject.push(interaction)
+
+                            followups = app.followups ? app.followups.map((followup, j) => {
+                                return (
+                                    <tr key={j}>
+                                        <td>{`Followup #${j + 1} from the last time I heard:`}</td>
+                                        <td>{this.props.getDateString(followup)}</td>
+                                        <td>[Check]</td>
+                                    </tr>
+                                )
+                            }) : null
+
+                            jsxObject.push(followups)
+                        }
+
+                        if (app.kind === 'interview') {
+                            interaction = (
+                                <tr key={i}>
+                                    <th>Interview scheduled on:</th>
+                                    <th>{this.props.getDateString(app.date)}</th>
+                                    <th>[Check]</th>
+                                </tr>
+                            )
+                            jsxObject.push(interaction)
+
+                            followups = app.followups ? app.followups.map((followup, j) => {
+                                return (
+                                    <tr key={j}>
+                                        <td>{`Followup #${j + 1} to interview:`}</td>
+                                        <td>{this.props.getDateString(followup)}</td>
+                                        <td>[Check]</td>
+                                    </tr>
+                                )
+                            }) : null
+
+                            jsxObject.push(followups)
+                        }
 
                         return jsxObject
                     })}

@@ -7,19 +7,18 @@ const Schema = mongoose.Schema
 // Define the schema
 
 const interactionSchema = new Schema({
-    interaction: Date,
+    kind: String,
+    date: Date,
     info: String,
     followups: [Date]
 })
 
 const progressSchema = new Schema({
-    state: {
+    status: {
         type: String,
         default: 'applied',
     },
-    applications: [interactionSchema],
-    callbacks: [interactionSchema],
-    interviews: [interactionSchema],
+    interactions: [interactionSchema]
 })
 
 const jobAppSchema = new Schema({

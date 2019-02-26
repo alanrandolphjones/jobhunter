@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Table, Button, Modal } from 'react-bootstrap'
 import EditJobApp from './EditJobApp'
 import Progress from './Progress'
+import axios from 'axios'
 
 export default class JobApp extends Component {
     constructor(props) {
@@ -11,13 +12,40 @@ export default class JobApp extends Component {
             expanded: false,
             show: false,
             appProperties: null,
-            // progress: null,
-            // nextActionDate: ''
         }
 
         this.handleClick = this.handleClick.bind(this)
         this.handleShow = this.handleShow.bind(this);
         this.handleClose = this.handleClose.bind(this);
+        this.deleteApp = this.deleteApp.bind(this)
+    }
+
+    componentWillReceiveProps = (newProps) => {
+        const appProperties = this.getAppProperties(newProps.app)
+        this.setState({
+            appProperties
+        })
+    }
+
+    async deleteApp() {
+
+        const appId = this.props.app._id
+        const user = this.props.user
+
+        user.jobApps = user.jobApps.filter((app) => {
+            return app._id !== appId
+        })
+
+        // Send to API with new data
+        try {
+            await axios.put(`/users/${this.props.user._id}/jobApp`, {
+                user
+            })
+            this.props.getUserData()
+        } catch (e) {
+            console.error(e)
+        }
+        
     }
 
     handleClose() {
@@ -30,7 +58,7 @@ export default class JobApp extends Component {
 
     componentDidMount() {
 
-        const appProperties = this.getAppProperties()
+        const appProperties = this.getAppProperties(this.props.app)
         
         this.setState({
             appProperties,
@@ -38,9 +66,8 @@ export default class JobApp extends Component {
         
     }
 
-    getAppProperties() {
-
-        const appPropertiesArray = Object.keys(this.props.app)
+    getAppProperties(app) {
+        const appPropertiesArray = Object.keys(app)
 
         const titles = {
             position: 'Position',
@@ -56,7 +83,7 @@ export default class JobApp extends Component {
             for (let title in titles) {
                 if (title === property) {
                     let newObj = {
-                        [property]: this.props.app[property],
+                        [property]: app[property],
                         title: titles[title],
                         input: property
                     }
@@ -70,7 +97,7 @@ export default class JobApp extends Component {
                 }
             }
             let newObj = {
-                [property]: this.props.app[property]
+                [property]: app[property]
             }
             return newObj
         })
@@ -178,12 +205,11 @@ export default class JobApp extends Component {
                                 getUserData={this.props.getUserData}
                                 jobApp={this.props.app}
                             >
-
                             </Progress>
-                            <div>
-                                <h3>What are your next steps?</h3>
-                                <p>Followup with recruiter [one week from application date]</p>
-                            </div>
+
+                            <Button bsStyle="danger" onClick={this.deleteApp}>
+                                Delete this Application
+                            </Button>
                         </td>
                     </tr> 
                 : null

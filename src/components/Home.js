@@ -31,24 +31,25 @@ export default class Home extends Component {
             apps
         })
     }
+    
     changeTabs = (openTab, user) => {
         let allApps = user.jobApps
         let apps = []
         if (openTab === 'completed') {
             allApps.forEach(app => {
-                if (app.progress.state === 'rejected' 
-                || app.progress.state === 'accepted' 
-                || app.progress.state === 'keepInTouch') {
+                if (app.progress.status === 'rejected' 
+                || app.progress.status === 'accepted' 
+                || app.progress.status === 'keepInTouch') {
                     apps.push(app)
                 }
             })
         } else {
             allApps.forEach(app => {
-                if (app.progress.state === 'unapplied' 
-                || app.progress.state === 'applied' 
-                || app.progress.state === 'callback' 
-                || app.progress.state === 'waitingForInterview' 
-                || app.progress.state === 'interview') {
+                if (app.progress.status === 'unapplied' 
+                || app.progress.status === 'applied' 
+                || app.progress.status === 'callback' 
+                || app.progress.status === 'waitingForInterview' 
+                || app.progress.status === 'interview') {
                     apps.push(app)
                 }
             })

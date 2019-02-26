@@ -33,7 +33,7 @@ const startup = new JobApp({
 })
 
 const startupProgress = new Progress({
-    state: "unapplied",
+    status: "unapplied",
 })
 
 startup.progress = startupProgress
@@ -51,10 +51,11 @@ const bigCorp = new JobApp({
 })
 
 const bigCorpProgress = new Progress({
-    state: "applied",
-    applications: [
+    status: "applied",
+    interactions: [
         new Interaction({
-            interaction: new Date('January 15 2019'),
+            kind: 'application',
+            date: new Date('January 15 2019'),
             info: "email to recruiter",
             followups: [
                 new Date("January 22 2019")
@@ -78,14 +79,15 @@ const dreamCompany = new JobApp({
 })
 
 const dreamCompanyProgress = new Progress({
-    state: "applied",
-    applications: [
+    status: "applied",
+    interactions: [
         new Interaction({
-            interaction: new Date('December 20 2018'),
+            kind: 'application',
+            date: new Date('December 20 2018'),
             followups: [
                 new Date("December 27 2018"),
                 new Date("January 4 2019"),
-                new Date("January 11 2019")
+                new Date("February 17 2019")
             ]
         })
     ]
@@ -106,20 +108,16 @@ const anotherJob = new JobApp({
 })
 
 const anotherJobProgress = new Progress({
-    state: "callback",
-    applications: [
+    status: "applied",
+    interactions: [
         new Interaction({
-            interaction: new Date('December 20 2018'),
+            kind: 'application',
+            date: new Date('December 20 2018'),
             followups: [
                 new Date("December 27 2018"),
                 new Date("January 4 2019"),
                 new Date("January 11 2019")
             ],
-        })
-    ],
-    callbacks: [
-        new Interaction({
-            interaction: new Date("January 13 2019"),
         })
     ]
 })
@@ -139,20 +137,20 @@ const fourthJob = new JobApp({
 })
 
 const fourthJobProgress = new Progress({
-    state: "callback",
-    applications: [
+    status: "callback",
+    interactions: [
         new Interaction({
-            interaction: new Date('December 2 2018'),
+            kind: 'application',
+            date: new Date('December 2 2018'),
             followups: [
                 new Date("December 9 2018"),
                 new Date("December 16 2018"),
                 new Date("December 17 2018")
             ]
-        })
-    ],
-    callbacks: [
+        }),
         new Interaction({
-            interaction: new Date("December 20 2018"),
+            kind: 'callback',
+            date: new Date("December 20 2018"),
         })
     ]
 })
@@ -172,25 +170,24 @@ const fifthJob = new JobApp({
 })
 
 const fifthJobProgress = new Progress({
-    state: "interview",
-    applications: [
+    status: "interview",
+    interactions: [
         new Interaction({
-            interaction: new Date('December 2 2018'),
+            kind: 'application',
+            date: new Date('December 2 2018'),
             followups: [
                 new Date("December 9 2018"),
                 new Date("December 16 2018"),
                 new Date("December 17 2018")
             ]
-        })
-    ],
-    callbacks: [
+        }),
         new Interaction({
-            interaction: new Date("December 20 2018"),
-        })
-    ],
-    interviews: [
+            kind: 'callback',
+            date: new Date("December 20 2018"),
+        }),
         new Interaction({
-            interaction: new Date("January 5 2019"),
+            kind: 'interview',
+            date: new Date("January 5 2019"),
             followups: [
                 new Date("January 6 2019")
             ]
@@ -213,25 +210,24 @@ const rejectedJob = new JobApp({
 })
 
 const rejectedJobProgress = new Progress({
-    state: "rejected",
-    applications: [
+    status: "rejected",
+    interactions: [
         new Interaction({
-            interaction: new Date('December 2 2018'),
+            kind: 'application',
+            date: new Date('December 2 2018'),
             followups: [
                 new Date("December 9 2018"),
                 new Date("December 16 2018"),
                 new Date("December 17 2018")
             ]
-        })
-    ],
-    callbacks: [
+        }),
         new Interaction({
-            interaction: new Date("December 20 2018"),
-        })
-    ],
-    interviews: [
+            kind: 'callback',
+            date: new Date("December 20 2018"),
+        }),
         new Interaction({
-            interaction: new Date("January 5 2019"),
+            kind: 'interview',
+            date: new Date("January 5 2019"),
             info: 'in person',
             followups: [
                 new Date("January 6 2019")
@@ -255,25 +251,24 @@ const laterJob = new JobApp({
 })
 
 const laterJobProgress = new Progress({
-    state: "keepInTouch",
-    applications: [
+    status: "keepInTouch",
+    interactions: [
         new Interaction({
-            interaction: new Date('December 2 2018'),
+            kind: 'application',
+            date: new Date('December 2 2018'),
             followups: [
                 new Date("December 9 2018"),
                 new Date("December 16 2018"),
                 new Date("December 17 2018")
             ]
-        })
-    ],
-    callbacks: [
+        }),
         new Interaction({
-            interaction: new Date("December 20 2018"),
-        })
-    ],
-    interviews: [
+            kind: 'callback',
+            date: new Date("December 20 2018"),
+        }),
         new Interaction({
-            interaction: new Date("January 5 2019"),
+            kind: 'interview',
+            date: new Date("January 5 2019"),
             info: "phone",
             followups: [
                 new Date("January 6 2019")
@@ -297,27 +292,25 @@ const acceptedJob = new JobApp({
 })
 
 const acceptedJobProgress = new Progress({
-    state: "accepted",
-
-    applications: [
+    status: "accepted",
+    interactions: [
         new Interaction({
-            interaction: new Date('December 2 2018'),
+            kind: 'application',
+            date: new Date('December 2 2018'),
             followups: [
                 new Date("December 9 2018"),
                 new Date("December 16 2018"),
                 new Date("December 17 2018")
             ]
-        })
-    ],
-    callbacks: [
+        }),
         new Interaction({
-            interaction: new Date("December 20 2018"),
+            kind: 'callback',
+            date: new Date("December 20 2018"),
             followups: new Date("December 29 2018")
-        })
-    ],
-    interviews: [
+        }),
         new Interaction({
-            interaction: new Date("January 5 2019"),
+            kind: 'interview',
+            date: new Date("January 5 2019"),
             info: 'in person',
             followups: [
                 new Date("January 6 2019")
