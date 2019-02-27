@@ -3,6 +3,7 @@ import { Table, Button, Modal } from 'react-bootstrap'
 import axios from 'axios'
 import ProgressPopup from './ProgressPopup'
 import ChangeStatusPopup from './ChangeStatusPopup'
+import EditProgress from './EditProgress'
 
 export default class Progress extends Component {
     constructor(props) {
@@ -14,6 +15,7 @@ export default class Progress extends Component {
             progressShow: false,
             lastActionDate: null,
             almostDone: false,
+            editshow: false
         }
 
         this.addInteraction = this.addInteraction.bind(this)
@@ -24,6 +26,16 @@ export default class Progress extends Component {
         this.handleChangeStatusClose = this.handleChangeStatusClose.bind(this)
         this.handleChangeStatusShow = this.handleChangeStatusShow.bind(this)
         this.changeStatus = this.changeStatus.bind(this)
+        this.handleEditShow = this.handleEditShow.bind(this)
+        this.handleEditClose = this.handleEditClose.bind(this)
+    }
+
+    handleEditShow() {
+        this.setState({editShow: true})
+    }
+
+    handleEditClose() {
+        this.setState({ editShow: false })
     }
 
     handleProgressClose() {
@@ -81,18 +93,6 @@ export default class Progress extends Component {
 
         return false
     }
-
-
-    // interviewUpcoming(interactions) {
-    //     let lastInterview
-    //     //Gets the last interaction in the array that has type 'interview'
-    //     interactions.forEach((interaction) => {
-    //         if (interaction.kind = 'interview') {
-    //             lastInterview = interaction
-    //         }
-    //     })
-    //     return lastInterview
-    // }
 
     getLastActionDate(progress) {        
         let lastActionDate
@@ -296,6 +296,17 @@ export default class Progress extends Component {
                     getDateString={this.props.getDateString}
                 ></ProgressPopup>
             </Modal>
+            <Modal
+                show={this.state.editShow}
+                onHide={this.handleEditClose}
+            >
+                <EditProgress
+                    interactions={this.state.progress.interactions}
+                    status={this.state.progress.status}
+                    handleClose={this.handleEditClose}
+                    getDateString={this.props.getDateString}
+                ></EditProgress>
+            </Modal>
             <Table bordered responsive>
                 <thead>
                     <tr>
@@ -448,6 +459,15 @@ export default class Progress extends Component {
                         return jsxObject
                     })}
                 </tbody>
+                <tfoot>
+                    <tr>
+                        <th colSpan="3">
+                            <Button bsStyle="primary" bsSize="small" onClick={this.handleEditShow}>
+                                Edit progress detail
+                            </Button>
+                        </th>
+                    </tr>
+                </tfoot>
             </Table>
             </>
         )

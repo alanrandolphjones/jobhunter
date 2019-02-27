@@ -108,7 +108,7 @@ dailyUpdate = () => {
 }
 
 //Scheduled daily update at midnight
-const update = schedule.scheduleJob({hour: 21, minute: 49}, function () {
+const update = schedule.scheduleJob({hour: 0, minute: 00}, function () {
     dailyUpdate()
 });
 
