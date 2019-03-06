@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Modal, Button } from 'react-bootstrap'
-// import axios from 'axios';
+import axios from 'axios';
 
 export default class EditProgress extends Component {
     constructor(props) {
@@ -8,11 +8,15 @@ export default class EditProgress extends Component {
 
         this.state = {
             interactions: null,
-            status: null
+            status: null,
+            _id: ''
         }
 
         this.handleChange = this.handleChange.bind(this)
         this.getDatesArray = this.getDatesArray.bind(this)
+        this.addInteraction = this.addInteraction.bind(this)
+        this.confirmStatus = this.confirmStatus.bind(this)
+        this.submitProgressChanges = this.submitProgressChanges.bind(this)
     }
 
     componentDidMount() {
@@ -21,19 +25,66 @@ export default class EditProgress extends Component {
         
         this.setState({
             interactions,
-            status
+            status,
         })
     }
 
     confirmStatus() {
-        //After change has been submitted, check status and change if necessary
+        const lastInteraction = this.state.interactions[this.state.interactions.length - 1]
+        const today = new Date()
+        const sevenDaysFromNow = new Date(today.setDate(today.getDate() + 7)); 
+        console.log(lastInteraction)
+        let status
+
+        if (lastInteraction.kind === 'application') {
+            status = 'applied'
+        }
+        if (lastInteraction.kind === 'callback') {
+            status = 'callback'
+        }
+        if (lastInteraction.kind === 'interview' && lastInteraction.date < today) {
+            status = 'waitingForInterview'
+        }
+        if (lastInteraction.kind === 'interview' && lastInteraction.date >= today) {
+            status = 'interview'
+        }
+        if (lastInteraction.followups && lastInteraction.followups[lastInteraction.followups.length - 1] > sevenDaysFromNow) {
+            status = 'rejected'
+        }
+        if (!lastInteraction.followups && lastInteraction.date > sevenDaysFromNow) {
+            status = 'rejected'
+        }
+
+        return status
+
     }
 
-    addNewInteraction() {
+    addInteraction() {
+        const interactions = this.state.interactions
+        const today = new Date()
 
+        const newInteraction = {
+            kind: '',
+            date: today,
+            followups: []
+        }
+
+        interactions.push(newInteraction)
+
+        this.setState({
+            interactions
+        })
     }
 
-    addFollowup() {
+    addFollowup(i) {
+        const interactions = this.state.interactions
+        const today = new Date()
+
+        interactions[i].followups.push(today)
+
+        this.setState({
+            interactions
+        })
 
     }
 
@@ -88,34 +139,40 @@ export default class EditProgress extends Component {
     }
 
     async submitProgressChanges(e) {
-        console.log(this.props.progress)
-        // e.preventDefault()
+        e.preventDefault()
+        // console.log(this.props.progress)
 
-        // const jobApp = this.state
-        // const user = this.props.user
+        const newStatus = this.confirmStatus()
+        console.log(newStatus)
 
-        // if (jobApp._id) {
-        //     user.jobApps = user.jobApps.map(function (app) {
-        //         if (app._id === jobApp._id) {
-        //             app = jobApp
-        //         }
-        //         return app
-        //     })
-        // } else {
-        //     user.jobApps.push(jobApp)
-        // }
+        const progress = this.state
+        progress.status = newStatus
+        const user = this.props.user
+        const jobApp = this.props.jobApp
 
-        // jobApp.progress.state = jobApp.progress.state ? jobApp.progress.state : 'applied'
+        jobApp.progress = progress
+    
+        //get user from props
+        if (jobApp._id) {
+            user.jobApps = user.jobApps.map(function (app) {
+                if (app._id === jobApp._id) {
+                    app = jobApp
+                }
+                return app
+            })
+        } else {
+            user.jobApps.push(jobApp)
+        }
 
-        // try {
-        //     await axios.put(`/users/${this.props.user._id}/jobApp`, {
-        //         user
-        //     })
-        //     this.props.handleClose()
-        //     this.props.getUserData()
-        // } catch (e) {
-        //     console.error(e)
-        // }
+        try {
+            await axios.put(`/users/${this.props.user._id}/jobApp`, {
+                user
+            })
+            this.props.handleClose()
+            this.props.getUserData()
+        } catch (e) {
+            console.error(e)
+        }
 
     }
 
@@ -176,9 +233,15 @@ export default class EditProgress extends Component {
                                         </div>
                                     )
                                 }) : null}
+
+                                {interaction.followups.length < 3 ? (
+                                    <Button onClick={() => this.addFollowup(i)}>Add followup</Button>
+                                ):null}
                             </div>)
                             
                         })}
+
+                        <Button onClick={this.addInteraction}>Add Interaction</Button>
 
 
                         <Button type="submit">Submit</Button>

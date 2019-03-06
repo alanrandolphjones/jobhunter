@@ -45,11 +45,12 @@ export default class Home extends Component {
             })
         } else {
             allApps.forEach(app => {
-                if (app.progress.status === 'unapplied' 
+                if (app.progress && (
+                    app.progress.status === 'unapplied' 
                 || app.progress.status === 'applied' 
                 || app.progress.status === 'callback' 
                 || app.progress.status === 'waitingForInterview' 
-                || app.progress.status === 'interview') {
+                || app.progress.status === 'interview')) {
                     apps.push(app)
                 }
             })

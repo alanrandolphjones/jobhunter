@@ -305,6 +305,9 @@ export default class Progress extends Component {
                     status={this.state.progress.status}
                     handleClose={this.handleEditClose}
                     getDateString={this.props.getDateString}
+                    getUserData={this.props.getUserData}
+                    user={this.props.user}
+                    jobApp={this.props.jobApp}
                 ></EditProgress>
             </Modal>
             <Table bordered responsive>
