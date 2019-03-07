@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Modal, Button } from 'react-bootstrap'
 import axios from 'axios';
+import _ from 'lodash'
 
 export default class EditProgress extends Component {
     constructor(props) {
@@ -9,7 +10,8 @@ export default class EditProgress extends Component {
         this.state = {
             interactions: null,
             status: null,
-            _id: ''
+            _id: '',
+            originalInteractionsArray: null
         }
 
         this.handleChange = this.handleChange.bind(this)
@@ -17,15 +19,17 @@ export default class EditProgress extends Component {
         this.addInteraction = this.addInteraction.bind(this)
         this.confirmStatus = this.confirmStatus.bind(this)
         this.submitProgressChanges = this.submitProgressChanges.bind(this)
+        this.deleteFollowup = this.deleteFollowup.bind(this)
     }
 
     componentDidMount() {
-        const interactions = this.props.interactions
+        console.log('mounted')
+        const interactions = _.cloneDeep(this.props.interactions)
         const status = this.props.status
         
         this.setState({
             interactions,
-            status,
+            status
         })
     }
 
@@ -33,7 +37,6 @@ export default class EditProgress extends Component {
         const lastInteraction = this.state.interactions[this.state.interactions.length - 1]
         const today = new Date()
         const sevenDaysFromNow = new Date(today.setDate(today.getDate() + 7)); 
-        console.log(lastInteraction)
         let status
 
         if (lastInteraction.kind === 'application') {
@@ -93,8 +96,6 @@ export default class EditProgress extends Component {
         const interactions = this.state.interactions
         const name = event.target.name
 
-        console.log(interactions)
-
         //For changes on the interaction kind
         if (name === "kind") {
             const key = event.target.id.split('_').pop()
@@ -109,11 +110,9 @@ export default class EditProgress extends Component {
         if (name === 'followup') {
             const followupKey = event.target.id.split('_')[2]
             const interactionsKey = event.target.id.split('_')[1]
-            console.log(interactionsKey, followupKey)
             interactions[interactionsKey].followups[followupKey] = this.getDatesArray(interactions[interactionsKey].followups[followupKey])[event.target.value]
         }
 
-        console.log(interactions)
 
         //Make new func for changes on followups
 
@@ -121,8 +120,6 @@ export default class EditProgress extends Component {
     }
 
     getDatesArray(date) {
-
-        console.log(date)
 
         const dates = []
         //90 day range before and after
@@ -138,13 +135,28 @@ export default class EditProgress extends Component {
         return dates
     }
 
+    deleteFollowup(i, j) {
+        const interactions = this.state.interactions
+        interactions[i].followups.splice(j, 1)
+
+        this.setState({
+            interactions
+        })
+    }
+
+    deleteInteraction(i) {
+        const interactions = this.state.interactions
+        interactions.splice(i, 1)
+
+        this.setState({
+            interactions
+        })
+    }
+
     async submitProgressChanges(e) {
         e.preventDefault()
-        // console.log(this.props.progress)
 
         const newStatus = this.confirmStatus()
-        console.log(newStatus)
-
         const progress = this.state
         progress.status = newStatus
         const user = this.props.user
@@ -219,6 +231,7 @@ export default class EditProgress extends Component {
                                         return <option key={i} value={i}>{this.props.getDateString(date)}</option>
                                     })}
                                 </select>
+                                <Button onClick={() => this.deleteInteraction(i)}>Delete interaction</Button>
 
                                 {interaction.followups ? interaction.followups.map((followup, j) => {
                                     return (
@@ -230,6 +243,7 @@ export default class EditProgress extends Component {
                                                     return <option key={k} value={k}>{this.props.getDateString(date)}</option>
                                                 })}
                                             </select>
+                                            <Button onClick={() => this.deleteFollowup(i, j)}>Delete followup</Button>
                                         </div>
                                     )
                                 }) : null}

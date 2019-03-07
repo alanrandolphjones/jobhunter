@@ -55,6 +55,7 @@ export default class Progress extends Component {
     }
 
     componentDidMount() {
+
         const progress = this.convertDateObjects(this.props.progress)
         const almostDone = this.isItAlmostDone(progress)
         let inProgress
@@ -386,6 +387,7 @@ export default class Progress extends Component {
             <Table bordered responsive key="key">
                 <tbody>
                     {this.state.progress.interactions.map((app, i) => {
+                        console.log('app', app, 'index', i)
                         const jsxObject = []
                         let interaction
                         let followups
