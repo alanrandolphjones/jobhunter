@@ -41,7 +41,7 @@ export default class JobApp extends Component {
             await axios.put(`/users/${this.props.user._id}/jobApp`, {
                 user
             })
-            this.props.getUserData()
+            this.props.getUserData(user._id)
         } catch (e) {
             console.error(e)
         }
@@ -194,6 +194,7 @@ export default class JobApp extends Component {
                                     properties={this.props.app}
                                     user={this.props.user}
                                     getUserData={this.props.getUserData}
+                                    getDateString={this.getDateString}
                                 ></EditJobApp>
                             </Modal>
                             <Progress

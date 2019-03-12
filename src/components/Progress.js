@@ -28,6 +28,7 @@ export default class Progress extends Component {
         this.changeStatus = this.changeStatus.bind(this)
         this.handleEditShow = this.handleEditShow.bind(this)
         this.handleEditClose = this.handleEditClose.bind(this)
+        this.convertDateObjects = this.convertDateObjects.bind(this)
     }
 
     handleEditShow() {
@@ -55,7 +56,6 @@ export default class Progress extends Component {
     }
 
     componentDidMount() {
-
         const progress = this.convertDateObjects(this.props.progress)
         const almostDone = this.isItAlmostDone(progress)
         let inProgress
@@ -70,6 +70,34 @@ export default class Progress extends Component {
         const lastActionDate = this.getLastActionDate(progress)
         const nextActionDate = this.getNextActionDate(lastActionDate, progress)
         
+        if (inProgress && almostDone && !nextActionDate) {
+            progress.status = 'rejected'
+        }
+
+        this.setState({
+            progress,
+            lastActionDate,
+            nextActionDate,
+            almostDone
+        })
+    }
+
+    componentWillReceiveProps = (newProps) => {
+        console.log('received props', newProps)
+        const progress = this.convertDateObjects(newProps.progress)
+        const almostDone = this.isItAlmostDone(progress)
+        let inProgress
+
+        const status = progress.status
+        if (status === 'applied' || status === 'callback' || status === 'interview' || status === 'waitingForInterview') {
+            inProgress = true
+        } else {
+            inProgress = false
+        }
+
+        const lastActionDate = this.getLastActionDate(progress)
+        const nextActionDate = this.getNextActionDate(lastActionDate, progress)
+
         if (inProgress && almostDone && !nextActionDate) {
             progress.status = 'rejected'
         }
@@ -189,7 +217,7 @@ export default class Progress extends Component {
                 user
             })
             this.props.handleClose()
-            this.props.getUserData()
+            this.props.getUserData(user._id)
         } catch (e) {
             console.error(e)
         }
@@ -352,7 +380,7 @@ export default class Progress extends Component {
 
                         {this.state.progress.status === 'callback' && this.state.nextActionDate && this.state.almostDone ?
                             <>
-                                <th colspan="2">{`If you don't hear from them by ${this.props.getDateString(this.state.nextActionDate)}, you should move on`}</th>
+                                <th colSpan="2">{`If you don't hear from them by ${this.props.getDateString(this.state.nextActionDate)}, you should move on`}</th>
                             </>
                         : null}
 
@@ -387,7 +415,6 @@ export default class Progress extends Component {
             <Table bordered responsive key="key">
                 <tbody>
                     {this.state.progress.interactions.map((app, i) => {
-                        console.log('app', app, 'index', i)
                         const jsxObject = []
                         let interaction
                         let followups

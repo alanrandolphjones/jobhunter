@@ -6,11 +6,13 @@ const schedule = require('node-schedule');
 
 // GET /users
 router.get('/', async (req, res, next) => {
+
     try {
         // 1. Find all the users in our database
         const docs = await User.find()
 
         // 2. If successful send back 200 OK with the users
+        console.log(doc)
         res.status(200).send({
             data: docs
         })
@@ -28,6 +30,7 @@ router.get('/:user_id', async (req, res, next) => {
     try {
         const doc = await User.findById(userId)
         // 3. If we find the specific user, send back 200 + the user doc
+        console.log(doc)
         res.status(200).send({
             data: [doc]
         })
@@ -35,6 +38,24 @@ router.get('/:user_id', async (req, res, next) => {
         // 4. If we don't handle the error 
         next(e)
     }
+})
+
+// POST /users
+router.post('/', async (req, res, next) => {
+
+    const user = new User(req.body.user)
+    
+    try {
+        const doc = await user.save()
+        //4. Respond with created todo
+        res.status(201).send({
+            data: [doc]
+        })
+    } catch (e) {
+        // 5. If error, send to the error handler
+        next(e)
+    }
+    
 })
 
 router.put('/:user_id/jobApp', async (req, res) => {
@@ -50,7 +71,6 @@ router.put('/:user_id/jobApp', async (req, res) => {
         })
         .catch(err => {
             console.log(err);
-
             res.status(500).json({ message: err.message });
         });
      

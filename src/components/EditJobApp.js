@@ -23,11 +23,12 @@ export default class ComponentName extends Component {
         this.handleChange = this.handleChange.bind(this)
         this.submitNewJobDetails = this.submitNewJobDetails.bind(this)
         this.componentDidMount = this.componentDidMount.bind(this)
+        this.getDatesArray = this.getDatesArray.bind(this)
+        this.handleDateChange = this.handleDateChange.bind(this)
     }
 
     componentDidMount() {      
         if (this.props.properties) {
-            console.log(this)
             for (let property in this.props.properties) {                
                 this.setState({ [property]: this.props.properties[property]})
             }
@@ -36,6 +37,29 @@ export default class ComponentName extends Component {
 
     handleChange(event) {
         this.setState({ [event.target.id]: event.target.value });
+    }
+
+    handleDateChange(event) {
+        const datesArray = this.getDatesArray(this.state.postDate)
+
+        console.log(datesArray[event.target.value])
+
+        this.setState({ [event.target.id]: datesArray[event.target.value] });
+    }
+
+    getDatesArray(date) {
+        const dates = []
+        //90 day range before and after
+        for (let i = -30; i < 60; i++) {
+
+            //Creating new Date object to prevent unintended modification of date
+            const steadyDate = new Date(date)
+            const newDate = new Date(steadyDate.setDate(steadyDate.getDate() + i))
+
+            dates.push(newDate)
+        }
+
+        return dates
     }
 
     async submitNewJobDetails(e) {
@@ -62,7 +86,7 @@ export default class ComponentName extends Component {
                 user
             })
             this.props.handleClose()
-            this.props.getUserData()
+            this.props.getUserData(user._id)
         } catch (e) {
             console.error(e)
         }
@@ -108,7 +132,11 @@ export default class ComponentName extends Component {
                     </div>
                     <div>
                         <label htmlFor="postDate">Date Posted:</label>
-                            <input type="text" id="postDate" value={this.state.postDate} onChange={this.handleChange}/>
+                            <select name="date" id="postDate" value="30" onChange={this.handleDateChange}>
+                                {this.getDatesArray(new Date(this.state.postDate)).map((date, i) => {
+                                    return <option key={i} value={i}>{this.props.getDateString(date)}</option>
+                                })}
+                            </select>
                     </div>
                     <div>
                         <label htmlFor="comments">Comments:</label>

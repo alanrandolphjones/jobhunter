@@ -11,7 +11,6 @@ export default class EditProgress extends Component {
             interactions: null,
             status: null,
             _id: '',
-            originalInteractionsArray: null
         }
 
         this.handleChange = this.handleChange.bind(this)
@@ -23,7 +22,6 @@ export default class EditProgress extends Component {
     }
 
     componentDidMount() {
-        console.log('mounted')
         const interactions = _.cloneDeep(this.props.interactions)
         const status = this.props.status
         
@@ -180,8 +178,9 @@ export default class EditProgress extends Component {
             await axios.put(`/users/${this.props.user._id}/jobApp`, {
                 user
             })
+            this.props.getUserData(user._id)
             this.props.handleClose()
-            this.props.getUserData()
+
         } catch (e) {
             console.error(e)
         }
