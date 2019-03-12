@@ -94,6 +94,61 @@ class App extends Component {
             interactions: [
               {
                 kind: 'application',
+                date: new Date('January 23 2019'),
+                followups: [
+                  new Date("February 1 2019"),
+                  new Date("February 7 2019"),
+                  new Date("February 14 2019")
+                ]
+              },
+              {
+                kind: 'callback',
+                date: new Date('February 20 2019'),
+              },
+              {
+                kind: 'interview',
+                date: new Date('March 1 2019'),
+                followups: [
+                  new Date("March 8 2019"),
+                  new Date("March 15 2019")
+                ]
+              }
+            ]
+          }
+        },
+        {
+          position: "Another Developer Position",
+          company: "Another Startup",
+          contactEmail: "recruiter@anotherstartup.com",
+          contactFirstName: "Jim",
+          contactLastName: "Zuckerberg",
+          progress: {
+            status: 'rejected',
+            interactions: [
+              {
+                kind: 'application',
+                date: new Date('January 5 2019'),
+                followups: [
+                  new Date("January 12 2019"),
+                  new Date("January 19 2019"),
+                  new Date("January 26 2019")
+                ]
+              }
+            ]
+          }
+        },
+        {
+          position: "Back End Developer",
+          company: "Another Tech Firm",
+          contactEmail: "recruiter@techfirm.com",
+          contactFirstName: "Bob",
+          contactLastName: "Gates",
+          postDate: new Date('February 1 2019'),
+          progress: {
+            status: 'keepInTouch',
+            interactions: [
+              {
+                kind: 'application',
                 date: new Date('February 23 2019'),
                 followups: [
                   new Date("March 1 2019"),
@@ -103,13 +158,36 @@ class App extends Component {
               },
               {
                 kind: 'callback',
-                date: new Date('February 2019'),
+                date: new Date('March 15 2019'),
+              }
+            ]
+          }
+        },
+        {
+          position: "Dream Job",
+          company: "Cool Company",
+          contactEmail: "jerry@cool.co",
+          contactFirstName: "Very",
+          contactLastName: "Cool",
+          postDate: new Date('November 1, 2018'),
+          progress: {
+            status: 'accepted',
+            interactions: [
+              {
+                kind: 'application',
+                date: new Date('February 1 2019'),
+                followups: [
+                  new Date("February 8 2019"),
+                ]
+              },
+              {
+                kind: 'callback',
+                date: new Date('February 13 2019'),
               },
               {
                 kind: 'interview',
-                date: new Date('March 1 2019'),
+                date: new Date('March 8 2019'),
                 followups: [
-                  new Date("March 8 2019"),
                   new Date("March 15 2019")
                 ]
               }
