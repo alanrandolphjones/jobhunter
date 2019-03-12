@@ -180,11 +180,15 @@ export default class JobApp extends Component {
                                         }
                                     })
                                 }
+                                <tr>
+                                    <th colSpan="2">
+                                            <Button bsStyle="primary" bsSize="small" onClick={this.handleShow}>
+                                                Edit application details
+                            </Button>
+                                    </th>
+                                </tr>
                                 </tbody>
                             </Table>
-                            <Button bsStyle="primary" bsSize="small" onClick={this.handleShow}>
-                                Edit application details
-                            </Button>
                             <Modal
                                 show={this.state.show}
                                 onHide={this.handleClose}

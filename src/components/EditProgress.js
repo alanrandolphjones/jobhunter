@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Modal, Button } from 'react-bootstrap'
+import { Table, Modal, Button } from 'react-bootstrap'
 import axios from 'axios';
 import _ from 'lodash'
 
@@ -201,67 +201,77 @@ export default class EditProgress extends Component {
 
                         {this.state.interactions.map((interaction, i) => {
 
-                            // let followupsJsx = interaction.followups ? interaction.followups.map((followup, j) => {
-                            //     return (
-                            //         <div className="followup" key={j}>
-                            //             <label htmlFor="">Followup #{j}</label>
-                            //             <select name="" id="">
-                            //                 <option value="">1</option>
-                            //                 <option value="">2</option>
-                            //                 <option value="">3</option>
-                            //             </select>
-                            //         </div>
-                            //     )
-                            // }) : null
-
-                            // Include new segment for date of interaction
-
-                            return ( <div className="interaction" key={i}>
-                                <label htmlFor="">Interaction with employer #{i}:</label>
-                                <select name="kind" id={`kind_${i}`} value={interaction.kind} onChange={this.handleChange}>
-                                    <option value="">Select one...</option>
-                                    <option value="application">Application</option>
-                                    <option value="callback">I heard back from them</option>
-                                    <option value="interview">An interview</option>
-                                </select>
-                                <label htmlFor="">Date of interaction</label>
-                                <select name="date" id={`date_${i}`} value="30" onChange={this.handleChange}>
-                                    {this.getDatesArray(interaction.date).map((date, i) => {
-                                        return <option key={i} value={i}>{this.props.getDateString(date)}</option>
-                                    })}
-                                </select>
-                                <Button onClick={() => this.deleteInteraction(i)}>Delete interaction</Button>
-
+                            return ( <Table bordered responsive key={i}>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <label htmlFor="">Interaction with employer #{i + 1}:</label>
+                                    </td>
+                                    <td>
+                                        <select name="kind" id={`kind_${i}`} value={interaction.kind} onChange={this.handleChange}>
+                                            <option value="application">Application</option>
+                                            <option value="callback">I heard back from them</option>
+                                            <option value="interview">An interview</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <Button bsStyle="danger" onClick={() => this.deleteInteraction(i)}>Delete interaction</Button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <label htmlFor="">Date of interaction</label>
+                                    </td>
+                                    <td>
+                                        <select name="date" id={`date_${i}`} value="30" onChange={this.handleChange}>
+                                            {this.getDatesArray(interaction.date).map((date, i) => {
+                                                return <option key={i} value={i}>{this.props.getDateString(date)}</option>
+                                            })}
+                                        </select>
+                                    </td>
+                                </tr>
                                 {interaction.followups ? interaction.followups.map((followup, j) => {
                                     return (
-                                        <div className="followup" key={j}>
-                                            <label htmlFor="">Followup #{j} date</label>
-                                            <select name="followup" id={`followup_${i}_${j}`} value="30" onChange={this.handleChange}>
-                                                {this.getDatesArray(followup).map((date, k) => {
-                                                    console.log()
-                                                    return <option key={k} value={k}>{this.props.getDateString(date)}</option>
-                                                })}
-                                            </select>
-                                            <Button onClick={() => this.deleteFollowup(i, j)}>Delete followup</Button>
-                                        </div>
+                                        <tr key={j}>
+                                            <td>
+                                                <label htmlFor="">Followup #{j + 1} date</label>
+                                            </td>
+                                            <td>
+                                                <select name="followup" id={`followup_${i}_${j}`} value="30" onChange={this.handleChange}>
+                                                    {this.getDatesArray(followup).map((date, k) => {
+                                                        console.log()
+                                                        return <option key={k} value={k}>{this.props.getDateString(date)}</option>
+                                                    })}
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <Button bsStyle="danger" bsSize="small" onClick={() => this.deleteFollowup(i, j)}>Delete followup</Button>
+                                            </td>
+                                        </tr>
                                     )
                                 }) : null}
 
                                 {interaction.followups.length < 3 ? (
-                                    <Button onClick={() => this.addFollowup(i)}>Add followup</Button>
+                                    <tr>
+                                        <td colSpan="2">
+                                            <Button bsStyle="primary" bsSize="small" onClick={() => this.addFollowup(i)}>Add followup</Button>
+                                        </td>
+                                    </tr>
                                 ):null}
-                            </div>)
+                            </tbody>
+                            </Table>)
                             
                         })}
-
-                        <Button onClick={this.addInteraction}>Add Interaction</Button>
-
-
-                        <Button type="submit">Submit</Button>
+                        <div style={{marginBottom: 20 + 'px'}}>
+                            <Button bsStyle="primary" onClick={this.addInteraction}>Add Interaction</Button>
+                        </div>
+                        <div>
+                            <Button bsStyle="success" bsSize="large" type="submit">Submit</Button>
+                        </div>
                     </form>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button onClick={this.props.handleClose}>Close</Button>
+                    <Button bsStyle="danger" onClick={this.props.handleClose}>Close</Button>
                 </Modal.Footer>
             </>
         )

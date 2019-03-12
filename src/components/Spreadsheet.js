@@ -30,7 +30,7 @@ export default class Spreadsheet extends Component {
         if (!this.props.apps) return <div>Loading!</div>
         if (this.props.apps) return (
             <div>
-                <Table bordered responsive >
+                <Table bordered responsive striped>
                     <thead>
                         <tr>
                             <th>#</th>

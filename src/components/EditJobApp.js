@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Modal, Button } from 'react-bootstrap'
+import { Table, Modal, Button } from 'react-bootstrap'
 import axios from 'axios';
 
 export default class ComponentName extends Component {
@@ -102,51 +102,96 @@ export default class ComponentName extends Component {
             </Modal.Header>
             <Modal.Body>
                     <form onSubmit={this.submitNewJobDetails}>
-                    <div>
-                        <label htmlFor="position">Position:</label>
-                        <input type="text" id="position" value={this.state.position} onChange={this.handleChange}/>
-                    </div>                    
-                    <div>
-                        <label htmlFor="company">Company:</label>
-                        <input type="text" id="company" value={this.state.company} onChange={this.handleChange}/>
-                    </div>    
-                    <div>
-                        <label htmlFor="contactFirstName">Contact First Name:</label>
-                            <input type="text" id="contactFirstName" value={this.state.contactFirstName} onChange={this.handleChange}/>
-                    </div>       
-                    <div>
-                        <label htmlFor="contactLastName">Contact First Name:</label>
-                            <input type="text" id="contactLastName" value={this.state.contactLastName} onChange={this.handleChange}/>
-                    </div>                         
-                    <div>
-                        <label htmlFor="contactEmail">Contact Email:</label>
-                            <input type="text" id="contactEmail" value={this.state.contactEmail} onChange={this.handleChange}/>
-                    </div>                    
-                    <div>
-                        <label htmlFor="jobBoard">Job Board:</label>
-                            <input type="text" id="jobBoard" value={this.state.jobBoard} onChange={this.handleChange}/>
-                    </div>                    
-                    <div>
-                        <label htmlFor="postingUrl">Job Posting:</label>
-                            <input type="text" id="postingUrl" value={this.state.postingUrl} onChange={this.handleChange}/>
-                    </div>
-                    <div>
-                        <label htmlFor="postDate">Date Posted:</label>
-                            <select name="date" id="postDate" value="30" onChange={this.handleDateChange}>
-                                {this.getDatesArray(new Date(this.state.postDate)).map((date, i) => {
-                                    return <option key={i} value={i}>{this.props.getDateString(date)}</option>
-                                })}
-                            </select>
-                    </div>
-                    <div>
-                        <label htmlFor="comments">Comments:</label>
-                            <textarea type="text" id="comments" value={this.state.comments} onChange={this.handleChange}></textarea>
-                    </div>
-                    <Button type="submit">Submit</Button>
+                    <Table bordered responsive>
+                        <tbody>
+
+                        <tr>
+                            <td>
+                                <label htmlFor="position">Position:</label>
+                            </td>
+                            <td>
+                                <input type="text" id="position" value={this.state.position} onChange={this.handleChange}/>
+                            </td>
+                        </tr>                    
+                        <tr>
+                            <td>
+                                <label htmlFor="company">Company:</label>
+                            </td>
+                            <td>
+                                <input type="text" id="company" value={this.state.company} onChange={this.handleChange}/>
+                            </td>
+                        </tr>    
+                        <tr>
+                            <td>
+                                <label htmlFor="contactFirstName">Contact First Name:</label>
+                            </td>
+                            <td>
+                                <input type="text" id="contactFirstName" value={this.state.contactFirstName} onChange={this.handleChange}/>
+                            </td>
+                        </tr>       
+                        <tr>
+                            <td>
+                                <label htmlFor="contactLastName">Contact First Name:</label>
+                            </td>
+                            <td>
+                                <input type="text" id="contactLastName" value={this.state.contactLastName} onChange={this.handleChange}/>
+                            </td>
+                        </tr>                         
+                        <tr>
+                            <td>
+                                <label htmlFor="contactEmail">Contact Email:</label>
+                            </td>
+                            <td>
+                                <input type="text" id="contactEmail" value={this.state.contactEmail} onChange={this.handleChange}/>
+                            </td>
+                        </tr>                    
+                        <tr>
+                            <td>
+                                <label htmlFor="jobBoard">Job Board:</label>
+                            </td>
+                            <td>
+                                <input type="text" id="jobBoard" value={this.state.jobBoard} onChange={this.handleChange}/>
+                            </td>
+                        </tr>                    
+                        <tr>
+                            <td>
+                                <label htmlFor="postingUrl">Job Posting:</label>
+                            </td>
+                            <td>
+                                <input type="text" id="postingUrl" value={this.state.postingUrl} onChange={this.handleChange}/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label htmlFor="postDate">Date Posted:</label>
+                            </td>
+                            <td>
+                                <select name="date" id="postDate" value="30" onChange={this.handleDateChange}>
+                                    {this.getDatesArray(new Date(this.state.postDate)).map((date, i) => {
+                                        return <option key={i} value={i}>{this.props.getDateString(date)}</option>
+                                    })}
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label htmlFor="comments">Comments:</label>
+                            </td>
+                            <td>
+                                <textarea type="text" id="comments" value={this.state.comments} onChange={this.handleChange}></textarea>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colSpan="2">
+                            <Button type="submit" bsStyle="success" bsSize="large">Submit</Button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </Table>
                 </form>
             </Modal.Body>
             <Modal.Footer>
-                    <Button onClick={this.props.handleClose}>Close</Button>
+                    <Button bsStyle="danger" onClick={this.props.handleClose}>Close</Button>
             </Modal.Footer>
             </>
         )

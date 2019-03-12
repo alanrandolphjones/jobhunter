@@ -424,7 +424,6 @@ export default class Progress extends Component {
                                 <tr key={i}>
                                     <th>Applied on:</th>
                                     <th>{this.props.getDateString(app.date)}</th>
-                                    <th>[Check]</th>
                                 </tr>
                             )
                             jsxObject.push(interaction)
@@ -434,7 +433,6 @@ export default class Progress extends Component {
                                     <tr key={j}>
                                         <td>{`Followup #${j + 1} to application:`}</td>
                                         <td>{this.props.getDateString(followup)}</td>
-                                        <td>[Check]</td>
                                     </tr>
                                 )
                             }) : null
@@ -447,7 +445,6 @@ export default class Progress extends Component {
                                 <tr key={i}>
                                     <th>Heard back from them on:</th>
                                     <th>{this.props.getDateString(app.date)}</th>
-                                    <th>[Check]</th>
                                 </tr>
                             )
                             jsxObject.push(interaction)
@@ -457,7 +454,6 @@ export default class Progress extends Component {
                                     <tr key={j}>
                                         <td>{`Followup #${j + 1} from the last time I heard:`}</td>
                                         <td>{this.props.getDateString(followup)}</td>
-                                        <td>[Check]</td>
                                     </tr>
                                 )
                             }) : null
@@ -470,7 +466,6 @@ export default class Progress extends Component {
                                 <tr key={i}>
                                     <th>Interview scheduled on:</th>
                                     <th>{this.props.getDateString(app.date)}</th>
-                                    <th>[Check]</th>
                                 </tr>
                             )
                             jsxObject.push(interaction)
@@ -480,7 +475,6 @@ export default class Progress extends Component {
                                     <tr key={j}>
                                         <td>{`Followup #${j + 1} to interview:`}</td>
                                         <td>{this.props.getDateString(followup)}</td>
-                                        <td>[Check]</td>
                                     </tr>
                                 )
                             }) : null
