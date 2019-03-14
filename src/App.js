@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Redirect } from 'react-router-dom';
+import { Modal, Button } from 'react-bootstrap';
 import './App.css';
 import axios from 'axios'
 import CustomNav from './components/CustomNav'
@@ -11,6 +12,7 @@ class App extends Component {
 
       this.state = {
         user: null,
+        show: true
       }
       this.getUserData = this.getUserData.bind(this)
     }
@@ -224,13 +226,31 @@ class App extends Component {
 
   }
 
-
+  handleClose = () => {
+    this.setState({
+      show: false
+    })
+  }
 
   render() {
 
     return (
       <Router>
         <div className="App">
+
+          <Modal show={this.state.show} onHide={this.handleClose}>
+            <Modal.Header>
+              <Modal.Title>JobHunter Info</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+            <p>JobHunter is a prototype for a web application that will help users organize their job search and keep track of job applications and recruitments.</p> 
+            <p>Feel free to play around with the app, but do not input any confidential or sensitive information. Data that you input will be stored via MongoDB and returned to you when you return to the site on the same browser.</p>
+              <p>For more information on JobHunter, click <a href="https://github.com/alanrandolphjones/jobhunter">HERE</a>.</p>
+            </Modal.Body>
+            <Modal.Footer>
+                <Button bsStyle="primary" onClick={this.handleClose}>Try JobHunter!</Button>
+            </Modal.Footer>
+          </Modal>
 
           <CustomNav />
 
