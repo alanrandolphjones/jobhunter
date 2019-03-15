@@ -47,7 +47,12 @@ export default class Spreadsheet extends Component {
                             <th>#</th>
                             <th>Position</th>
                             <th>Employer</th>
-                            <th>Next Steps</th>
+
+                            {this.props.openTab === 'inProgress' ? 
+                                <th>Next Steps</th>
+                                : <th>Status</th>
+                            }
+
                             <th>Expand</th>
                         </tr>
                     </thead>

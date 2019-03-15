@@ -31,3 +31,4 @@ JobHunter was made with:
 - Account-based signups and logins
 - Improved validation on form submissions
 - Improved styling
+- Responsive design
