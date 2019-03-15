@@ -33,6 +33,7 @@ export default class EditProgress extends Component {
 
     confirmStatus() {
         const lastInteraction = this.state.interactions[this.state.interactions.length - 1]
+
         const today = new Date()
         const sevenDaysFromNow = new Date(today.setDate(today.getDate() + 7)); 
         let status
@@ -44,10 +45,10 @@ export default class EditProgress extends Component {
             status = 'callback'
         }
         if (lastInteraction.kind === 'interview' && lastInteraction.date < today) {
-            status = 'waitingForInterview'
+            status = 'interview'
         }
         if (lastInteraction.kind === 'interview' && lastInteraction.date >= today) {
-            status = 'interview'
+            status = 'waitingForInterview'
         }
         if (lastInteraction.followups && lastInteraction.followups[lastInteraction.followups.length - 1] > sevenDaysFromNow) {
             status = 'rejected'

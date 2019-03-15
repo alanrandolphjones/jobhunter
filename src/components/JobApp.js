@@ -59,8 +59,6 @@ export default class JobApp extends Component {
 
     componentDidMount() {
         const appProperties = this.getAppProperties(this.props.app)
-
-        console.log(appProperties)
         
         this.setState({
             appProperties,
