@@ -28,7 +28,6 @@ export default class Progress extends Component {
         this.changeStatus = this.changeStatus.bind(this)
         this.handleEditShow = this.handleEditShow.bind(this)
         this.handleEditClose = this.handleEditClose.bind(this)
-        this.convertDateObjects = this.convertDateObjects.bind(this)
     }
 
     handleEditShow() {
@@ -56,8 +55,8 @@ export default class Progress extends Component {
     }
 
     componentDidMount() {
-        const progress = this.convertDateObjects(this.props.progress)
-        const almostDone = this.isItAlmostDone(progress)
+        const progress = this.props.convertDateObjects(this.props.progress)
+        const almostDone = this.props.isItAlmostDone(progress)
         let inProgress
 
         const status = progress.status
@@ -67,8 +66,8 @@ export default class Progress extends Component {
             inProgress = false
         }
 
-        const lastActionDate = this.getLastActionDate(progress)
-        const nextActionDate = this.getNextActionDate(lastActionDate, progress)
+        const lastActionDate = this.props.getLastActionDate(progress)
+        const nextActionDate = this.props.getNextActionDate(lastActionDate, progress)
         
         if (inProgress && almostDone && !nextActionDate) {
             progress.status = 'rejected'
@@ -84,8 +83,8 @@ export default class Progress extends Component {
 
     componentWillReceiveProps = (newProps) => {
         console.log('received props', newProps)
-        const progress = this.convertDateObjects(newProps.progress)
-        const almostDone = this.isItAlmostDone(progress)
+        const progress = this.props.convertDateObjects(newProps.progress)
+        const almostDone = this.props.isItAlmostDone(progress)
         let inProgress
 
         const status = progress.status
@@ -95,8 +94,8 @@ export default class Progress extends Component {
             inProgress = false
         }
 
-        const lastActionDate = this.getLastActionDate(progress)
-        const nextActionDate = this.getNextActionDate(lastActionDate, progress)
+        const lastActionDate = this.props.getLastActionDate(progress)
+        const nextActionDate = this.props.getNextActionDate(lastActionDate, progress)
 
         if (inProgress && almostDone && !nextActionDate) {
             progress.status = 'rejected'
@@ -108,86 +107,6 @@ export default class Progress extends Component {
             nextActionDate,
             almostDone
         })
-    }
-
-    isItAlmostDone(progress) {
-
-        const status = progress.status
-        if (status === 'applied' || status === 'callback' || status === 'interview') {
-            let lastResponse
-            lastResponse = progress.interactions[progress.interactions.length - 1]
-
-            if (lastResponse.followups.length === 3) return true
-        }
-
-        return false
-    }
-
-    getLastActionDate(progress) {        
-        let lastActionDate
-
-        const status = progress.status
-
-        if (status === 'applied' || status === 'callback' || status === 'interview' || status === 'waitingForInterview') {
-            let lastResponse
-            lastResponse = progress.interactions[progress.interactions.length - 1]
-
-            lastActionDate =
-                lastResponse.followups.length > 0 ?
-                    lastResponse.followups[lastResponse.followups.length - 1] :
-                    lastResponse.date
-        }
-        return lastActionDate
-    }
-
-    getNextActionDate(lastActionDate, progress) {
-
-        let nextActionDate
-
-        if (lastActionDate) {
-
-            //Have to create new object or they will both have same ref
-            nextActionDate = new Date(lastActionDate.getTime())
-            nextActionDate.setDate(nextActionDate.getDate() + 7)
-
-            //Do not return a number if date has passed
-            const now = new Date()
-
-            if (nextActionDate <= now) {
-                return false
-            }
-            
-        }
-
-        if (progress && progress.status === 'waitingForInterview') {
-            const lastInterview = progress.interactions[progress.interactions.length - 1]
-
-            nextActionDate = lastInterview.followups > 0 ?
-                lastInterview.followups[lastInterview.followups.length - 1] :
-                lastInterview.date 
-            
-            const now = new Date()
-            if (nextActionDate <= now) {
-                return false
-            }
-        }
-        return nextActionDate
-    }
-
-    convertDateObjects(appProgress) {
-        // //Convert dates to JS Date objects
-        for (let key in appProgress) {
-            if (key !== 'status' && key !== '_id') {
-                appProgress[key] = appProgress[key].map((property) => {
-                    property.date = new Date(property.date)
-                    property.followups = property.followups.map((followup) => {
-                        return new Date(followup)
-                    })
-                    return property
-                })
-            }
-        }
-        return appProgress
     }
 
     async updateDatabase(progress) {
@@ -239,7 +158,7 @@ export default class Progress extends Component {
         progress.interactions.push(app)
 
         const lastActionDate = date
-        const nextActionDate = this.getNextActionDate(lastActionDate)
+        const nextActionDate = this.props.getNextActionDate(lastActionDate)
 
         this.setState({
             nextActionDate,
@@ -258,8 +177,8 @@ export default class Progress extends Component {
         //Add new followup to array
         lastResponse.followups.push(followup)
         //Change nextActionDate in state
-        const lastActionDate = this.getLastActionDate(progress)
-        const nextActionDate = this.getNextActionDate(lastActionDate)
+        const lastActionDate = this.props.getLastActionDate(progress)
+        const nextActionDate = this.props.getNextActionDate(lastActionDate)
 
         this.setState({
             nextActionDate,

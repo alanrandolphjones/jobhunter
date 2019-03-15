@@ -23,10 +23,21 @@ export default class Spreadsheet extends Component {
         this.setState({ show: true });
     }
 
+    getDateString(dateObj) {
+        const month = dateObj.getMonth()
+        const year = dateObj.getFullYear()
+        const date = dateObj.getDate()
+
+        const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+
+        return `${months[month]} ${date}, ${year}`
+    }
+
     render() {
 
         const user = this.props.user
         const getUserData = this.props.getUserData
+        const getDateString = this.getDateString
         if (!this.props.apps) return <div>Loading!</div>
         if (this.props.apps) return (
             <div>
@@ -49,6 +60,7 @@ export default class Spreadsheet extends Component {
                                     index={i} 
                                     user={user}
                                     getUserData={getUserData}
+                                    getDateString={getDateString}
                                 />
                             })
                         }
@@ -73,6 +85,7 @@ export default class Spreadsheet extends Component {
                         handleClose={this.handleClose}
                         user={this.props.user}
                         getUserData={this.props.getUserData}
+                        getDateString={this.getDateString}
                     ></EditJobApp>
                 </Modal>
             </div>

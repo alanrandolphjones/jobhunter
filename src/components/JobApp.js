@@ -18,6 +18,7 @@ export default class JobApp extends Component {
         this.handleShow = this.handleShow.bind(this);
         this.handleClose = this.handleClose.bind(this);
         this.deleteApp = this.deleteApp.bind(this)
+        this.convertDateObjects = this.convertDateObjects.bind(this)
     }
 
     componentWillReceiveProps = (newProps) => {
@@ -57,7 +58,6 @@ export default class JobApp extends Component {
     }
 
     componentDidMount() {
-
         const appProperties = this.getAppProperties(this.props.app)
         
         this.setState({
@@ -90,7 +90,7 @@ export default class JobApp extends Component {
 
                     if (property === 'postDate') {
                         const dateObj = new Date(newObj.postDate)
-                        newObj.dateString = this.getDateString(dateObj)
+                        newObj.dateString = this.props.getDateString(dateObj)
                     }
 
                     return newObj
@@ -102,18 +102,118 @@ export default class JobApp extends Component {
             return newObj
         })
 
+        appProperties.progressProps = this.getAppProgress(app.progress)
+
         return appProperties
 
     }
 
-    getDateString(dateObj) {
-        const month = dateObj.getMonth()
-        const year = dateObj.getFullYear()
-        const date = dateObj.getDate()
+    convertDateObjects(appProgress) {
 
-        const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+        // //Convert dates to JS Date objects
+        for (let key in appProgress) {
+            if (key !== 'status' && key !== '_id') {
+                appProgress[key] = appProgress[key].map((property) => {
+                    property.date = new Date(property.date)
+                    property.followups = property.followups.map((followup) => {
+                        return new Date(followup)
+                    })
+                    return property
+                })
+            }
+        }
+        return appProgress
+    }
 
-        return `${months[month]} ${date}, ${year}`
+    isItAlmostDone(progress) {
+
+        const status = progress.status
+        if (status === 'applied' || status === 'callback' || status === 'interview') {
+            let lastResponse
+            lastResponse = progress.interactions[progress.interactions.length - 1]
+            if (lastResponse.followups.length === 3) return true
+        }
+
+        return false
+    }
+
+    getLastActionDate(progress) {
+        let lastActionDate
+
+        const status = progress.status
+
+        if (status === 'applied' || status === 'callback' || status === 'interview' || status === 'waitingForInterview') {
+            let lastResponse
+            lastResponse = progress.interactions[progress.interactions.length - 1]
+
+            lastActionDate =
+                lastResponse.followups.length > 0 ?
+                    lastResponse.followups[lastResponse.followups.length - 1] :
+                    lastResponse.date
+        }
+        return lastActionDate
+    }
+
+    getNextActionDate(lastActionDate, progress) {
+
+        let nextActionDate
+
+        if (lastActionDate) {
+
+            //Have to create new object or they will both have same ref
+            nextActionDate = new Date(lastActionDate.getTime())
+            nextActionDate.setDate(nextActionDate.getDate() + 7)
+
+            //Do not return a number if date has passed
+            const now = new Date()
+
+            if (nextActionDate <= now) {
+                return false
+            }
+
+        }
+
+        if (progress && progress.status === 'waitingForInterview') {
+            const lastInterview = progress.interactions[progress.interactions.length - 1]
+
+            nextActionDate = lastInterview.followups > 0 ?
+                lastInterview.followups[lastInterview.followups.length - 1] :
+                lastInterview.date
+
+            const now = new Date()
+            if (nextActionDate <= now) {
+                return false
+            }
+        }
+        return nextActionDate
+    }
+
+    getAppProgress = (progress) => {
+
+        const newProgress = this.convertDateObjects(progress)
+        const almostDone = this.isItAlmostDone(newProgress)
+        let inProgress
+
+        const status = newProgress.status
+        if (status === 'applied' || status === 'callback' || status === 'interview' || status === 'waitingForInterview') {
+            inProgress = true
+        } else {
+            inProgress = false
+        }
+
+        const lastActionDate = this.getLastActionDate(newProgress)
+        const nextActionDate = this.getNextActionDate(lastActionDate, newProgress)
+
+        if (inProgress && almostDone && !nextActionDate) {
+            progress.status = 'rejected'
+        }
+
+        return {
+            progress: newProgress,
+            lastActionDate: lastActionDate,
+            nextActionDate: nextActionDate,
+            almostDone: almostDone
+        }
     }
 
     handleClick() {
@@ -198,17 +298,21 @@ export default class JobApp extends Component {
                                     properties={this.props.app}
                                     user={this.props.user}
                                     getUserData={this.props.getUserData}
-                                    getDateString={this.getDateString}
+                                    getDateString={this.props.getDateString}
                                 ></EditJobApp>
                             </Modal>
                             <Progress
                                 progress={this.props.app.progress}
-                                getDateString={this.getDateString}
+                                getDateString={this.props.getDateString}
                                 handleClose={this.handleClose}
                                 properties={this.props.app}
                                 user={this.props.user}
                                 getUserData={this.props.getUserData}
                                 jobApp={this.props.app}
+                                convertDateObjects={this.convertDateObjects}
+                                isItAlmostDone={this.isItAlmostDone}
+                                getLastActionDate={this.getLastActionDate}
+                                getNextActionDate={this.getNextActionDate}
                             >
                             </Progress>
 

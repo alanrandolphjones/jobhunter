@@ -66,6 +66,14 @@ export default class ComponentName extends Component {
         e.preventDefault()
 
         const jobApp = this.state
+        jobApp.progress.status = 'applied'
+        jobApp.progress.interactions = []
+        const interaction = {
+            kind: 'application',
+            date: new Date(),
+            followups: []
+        }
+        jobApp.progress.interactions.push(interaction)
         const user = this.props.user
 
         if (jobApp._id) {
@@ -79,7 +87,7 @@ export default class ComponentName extends Component {
             user.jobApps.push(jobApp)
         }
 
-        jobApp.progress.state = jobApp.progress.state ? jobApp.progress.state : 'applied'
+        // jobApp.progress.state = jobApp.progress.state ? jobApp.progress.state : 'applied'
 
         try {
             await axios.put(`/users/${this.props.user._id}/jobApp`, {
