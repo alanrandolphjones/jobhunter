@@ -14,7 +14,7 @@ export default class CustomNav extends Component {
                     </Navbar.Header>
                     <Nav pullRight>
                         <NavItem eventKey ={1} className="navbar-nav-item">
-                            <Button>Sign Out</Button>
+                            {/* <Button>Sign Out</Button> */}
                         </NavItem>
                     </Nav>
                 </Navbar>
