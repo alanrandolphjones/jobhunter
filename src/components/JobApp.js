@@ -59,6 +59,8 @@ export default class JobApp extends Component {
 
     componentDidMount() {
         const appProperties = this.getAppProperties(this.props.app)
+
+        console.log(appProperties)
         
         this.setState({
             appProperties,
@@ -68,7 +70,6 @@ export default class JobApp extends Component {
 
     getAppProperties(app) {
         const appPropertiesArray = Object.keys(app)
-
         const titles = {
             position: 'Position',
             company: 'Company',
@@ -79,7 +80,6 @@ export default class JobApp extends Component {
             comments: 'Comments',
         }
         const appProperties = appPropertiesArray.map((property) => {
-
             for (let title in titles) {
                 if (title === property) {
                     let newObj = {
@@ -101,11 +101,8 @@ export default class JobApp extends Component {
             }
             return newObj
         })
-
         appProperties.progressProps = this.getAppProgress(app.progress)
-
         return appProperties
-
     }
 
     convertDateObjects(appProgress) {
@@ -226,7 +223,7 @@ export default class JobApp extends Component {
 
     render() {
 
-        if (!this.props.app) return <tr><td>There are no apps here, dawg</td></tr>
+        if (!this.state.appProperties) return <tr><td>There are no apps here, dawg</td></tr>
 
         return (
             <>
@@ -234,7 +231,51 @@ export default class JobApp extends Component {
                 <td>{this.props.index + 1}</td>
                 <td>{this.props.app.position}</td>
                 <td>{this.props.app.company}</td>
-                <td>Interview on January 5</td>
+
+
+                    {this.state.appProperties.progressProps.progress.status !== 'waitingForInterview' && this.state.appProperties.progressProps.nextActionDate && !this.state.appProperties.progressProps.almostDone ?
+                        <td>{`Send a followup email on ${this.props.getDateString(this.state.appProperties.progressProps.nextActionDate)}`}</td>
+                        : null}
+                    {this.state.appProperties.progressProps.progress.status !== 'waitingForInterview' && !this.state.appProperties.progressProps.nextActionDate && !this.state.appProperties.progressProps.almostDone ?
+                        <td>Send a followup email, ASAP!</td>
+                        : null}
+                    {this.state.appProperties.progressProps.progress.status !== 'waitingForInterview' && this.state.appProperties.progressProps.nextActionDate && this.state.appProperties.progressProps.almostDone ?
+                        <td>Wait for a response!</td>
+                        : null}
+                    {/* {this.state.appProperties.progressProps.progress.status === 'callback' && this.state.appProperties.progressProps.nextActionDate && !this.state.appProperties.progressProps.almostDone ?
+                        <td>{`Send a followup email on ${this.props.getDateString(this.state.appProperties.progressProps.nextActionDate)}`}</td>
+                        : null}
+                    {this.state.appProperties.progressProps.progress.status === 'callback' && !this.state.appProperties.progressProps.nextActionDate && !this.state.appProperties.progressProps.almostDone ?
+                        <td>Send a followup email, ASAP!</td>
+                        : null}
+                    {this.state.appProperties.progressProps.progress.status === 'callback' && this.state.appProperties.progressProps.nextActionDate && this.state.appProperties.progressProps.almostDone ?
+                        <td>Wait for a response!</td>
+                        : null}
+                    {this.state.appProperties.progressProps.progress.status === 'interview' && this.state.appProperties.progressProps.nextActionDate && !this.state.appProperties.progressProps.almostDone ?
+                        <>
+                            <th>{`If you don't hear from them again soon, send a followup email on ${this.props.getDateString(this.state.nextActionDate)}`}</th>
+                            <th><Button bsStyle="success" bsSize="small" onClick={this.handleChangeStatusShow}>I heard back!</Button></th>
+                        </>
+                        : null}
+
+                    {this.state.appProperties.progressProps.progress.status === 'interview' && !this.state.appProperties.progressProps.nextActionDate && !this.state.appProperties.progressProps.almostDone ?
+                        <>
+                            <th>Haven't heard back? Send a followup email!</th>
+                            <th><Button bsStyle="success" bsSize="small" onClick={this.handleProgressShow}>Done! What's next?</Button></th>
+                        </>
+                        : null}
+
+                    {this.state.appProperties.progressProps.progress.status === 'interview' && this.state.appProperties.progressProps.nextActionDate && this.state.appProperties.progressProps.almostDone ?
+                        <>
+                            <th colspan="2">{`If you don't hear back from them by ${this.props.getDateString(this.state.nextActionDate)}, you should move on`}</th>
+                        </>
+                        : null} */}
+
+                    {this.state.appProperties.progressProps.progress.status === 'waitingForInterview' && this.state.appProperties.progressProps.nextActionDate ?
+                        <td>{`Interview on ${this.props.getDateString(this.state.appProperties.progressProps.nextActionDate)}`}</td>
+                    : null}
+
+
                 <td><button onClick={this.handleClick}>{this.state.expanded ? "Collapse" : "Expand"}</button></td>
             </tr>
             {this.state.expanded 
