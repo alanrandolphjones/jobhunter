@@ -235,9 +235,9 @@ class App extends Component {
     // const jobhunterId = null
     if (jobhunterId && update === "1") {
       console.log('hello')
-      await this.getUserData(jobhunterId)
+      // await this.getUserData(jobhunterId)
     } else {
-      await this.createUserForDemo()
+      // await this.createUserForDemo()
     }
 
   }
@@ -246,6 +246,17 @@ class App extends Component {
     this.setState({
       show: false
     })
+  }
+
+  onSignIn = (googleUser) => {
+    var profile = googleUser.getBasicProfile();
+    console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
+    console.log('Name: ' + profile.getName());
+    console.log('Image URL: ' + profile.getImageUrl());
+    console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
+
+    var id_token = googleUser.getAuthResponse().id_token;
+    console.log("ID Token: " + id_token);
   }
 
   render() {
@@ -308,7 +319,7 @@ class App extends Component {
                 to={`/user/${this.state.user.userName}`}
               />
             :
-              <div>Login Screen</div> 
+              <div className="g-signin2" data-onsuccess="onSignIn"></div>
             )}
           />
 
