@@ -206,7 +206,7 @@ export default class Progress extends Component {
                         status={this.state.progress.status}
                     ></ChangeStatusPopup>
                 </Modal>
-                <Table>
+                <Table bordered responsive>
                     <thead>
                         <tr>
                             <th>Next Steps:</th>

@@ -269,7 +269,7 @@ export default class JobApp extends Component {
                         <td>Rejected</td>
                     : null}
                     {this.state.appProperties.progressProps.progress.status === 'accepted' ?
-                        <td>Congratulations, you were accepted!</td>
+                        <td>Congratulations, you got the job!</td>
                     : null}
 
 

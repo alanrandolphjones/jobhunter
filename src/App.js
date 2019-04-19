@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Redirect } from 'react-router-dom';
 import { Modal, Button } from 'react-bootstrap';
+import Datejs from 'datejs'
 import './App.css';
 import axios from 'axios'
 import CustomNav from './components/CustomNav'
@@ -28,6 +29,14 @@ class App extends Component {
 
   //For demo purposes, this will create an account for new visitors using this model. Will delete once I add account-based login functionality
   createUserForDemo = async () => {
+
+    const startupDate = (5).days().ago()
+    const techGiantDate = (6).weeks().ago()
+    const enterpriseDate = (8).weeks().ago()
+    const anotherstartupDate = (3).months().ago()
+    const anotherTechFirmDate = (6).weeks().ago()
+    const dreamJobDate = (6).weeks().ago()    
+
     const user = {
       firstName: 'User',
       lastName: 'At Large',
@@ -46,9 +55,9 @@ class App extends Component {
             interactions: [
               {
                 kind: 'application',
-                date: new Date('March 1 2019'),
+                date: startupDate,
                 followups: [
-                  new Date("March 7 2019")
+                  new Date(startupDate).addDays(7)
                 ]
               }
             ]
@@ -66,20 +75,20 @@ class App extends Component {
             interactions: [
               {
                 kind: 'application',
-                date: new Date('February 23 2019'),
+                date: new Date(techGiantDate).addDays(14),
                 followups: [
-                  new Date("March 1 2019"),
-                  new Date("March 7 2019"),
-                  new Date("March 14 2019")
+                  new Date(techGiantDate).addDays(21),
+                  new Date(techGiantDate).addDays(28),
+                  new Date(techGiantDate).addDays(35)
                 ]
               },
               {
                 kind: 'callback',
-                date: new Date('March 15 2019'),
+                date: new Date(techGiantDate).addDays(36),
               },
               {
                 kind: 'interview',
-                date: new Date('April 5 2019'),
+                date: new Date(techGiantDate).addDays(55),
               }
             ]
           }
@@ -90,29 +99,29 @@ class App extends Component {
           contactEmail: "jerry@enterprise.co",
           contactFirstName: "Jerry",
           contactLastName: "Enterprise",
-          postDate: new Date('November 1, 2018'),
+          postDate: enterpriseDate,
           progress: {
             status: 'interview',
             interactions: [
               {
                 kind: 'application',
-                date: new Date('January 23 2019'),
+                date: new Date(enterpriseDate).addDays(7),
                 followups: [
-                  new Date("February 1 2019"),
-                  new Date("February 7 2019"),
-                  new Date("February 14 2019")
+                  new Date(enterpriseDate).addDays(14),
+                  new Date(enterpriseDate).addDays(21),
+                  new Date(enterpriseDate).addDays(28)
                 ]
               },
               {
                 kind: 'callback',
-                date: new Date('February 20 2019'),
+                date: new Date(enterpriseDate).addDays(34),
               },
               {
                 kind: 'interview',
-                date: new Date('March 1 2019'),
+                date: new Date(enterpriseDate).addDays(40),
                 followups: [
-                  new Date("March 8 2019"),
-                  new Date("March 15 2019")
+                  new Date(enterpriseDate).addDays(47),
+                  new Date(enterpriseDate).addDays(54)
                 ]
               }
             ]
@@ -129,11 +138,11 @@ class App extends Component {
             interactions: [
               {
                 kind: 'application',
-                date: new Date('January 5 2019'),
+                date: anotherstartupDate,
                 followups: [
-                  new Date("January 12 2019"),
-                  new Date("January 19 2019"),
-                  new Date("January 26 2019")
+                  new Date(anotherstartupDate).addDays(7),
+                  new Date(anotherstartupDate).addDays(14),
+                  new Date(anotherstartupDate).addDays(21)
                 ]
               }
             ]
@@ -145,22 +154,22 @@ class App extends Component {
           contactEmail: "recruiter@techfirm.com",
           contactFirstName: "Bob",
           contactLastName: "Gates",
-          postDate: new Date('February 1 2019'),
+          postDate: anotherTechFirmDate,
           progress: {
             status: 'keepInTouch',
             interactions: [
               {
                 kind: 'application',
-                date: new Date('February 23 2019'),
+                date: new Date(anotherTechFirmDate).addDays(7),
                 followups: [
-                  new Date("March 1 2019"),
-                  new Date("March 7 2019"),
-                  new Date("March 14 2019")
+                  new Date(anotherTechFirmDate).addDays(14),
+                  new Date(anotherTechFirmDate).addDays(21),
+                  new Date(anotherTechFirmDate).addDays(28)
                 ]
               },
               {
                 kind: 'callback',
-                date: new Date('March 15 2019'),
+                date: new Date(anotherTechFirmDate).addDays(35),
               }
             ]
           }
@@ -171,26 +180,26 @@ class App extends Component {
           contactEmail: "jerry@cool.co",
           contactFirstName: "Very",
           contactLastName: "Cool",
-          postDate: new Date('November 1, 2018'),
+          postDate: new Date(dreamJobDate).addDays(7),
           progress: {
             status: 'accepted',
             interactions: [
               {
                 kind: 'application',
-                date: new Date('February 1 2019'),
+                date: new Date(dreamJobDate).addDays(14),
                 followups: [
-                  new Date("February 8 2019"),
+                  new Date(dreamJobDate).addDays(21),
                 ]
               },
               {
                 kind: 'callback',
-                date: new Date('February 13 2019'),
+                date: new Date(dreamJobDate).addDays(28),
               },
               {
                 kind: 'interview',
-                date: new Date('March 8 2019'),
+                date: new Date(dreamJobDate).addDays(35),
                 followups: [
-                  new Date("March 15 2019")
+                  new Date(dreamJobDate).addDays(42)
                 ]
               }
             ]
@@ -201,13 +210,13 @@ class App extends Component {
 
     //Posting demo user to database
     try {
-      console.log(user)
       axios.post('/users', {
         user
       }).then((res) => {
         const demoUserId = res.data.data[0]._id
         //Loading new data, which will trigger a login into demo user account
         window.localStorage.setItem('jobhunterId', demoUserId)
+        window.localStorage.setItem('jobhunterUpdate', 1)
         this.getUserData(demoUserId)
       })
     } catch (e) {
@@ -218,8 +227,14 @@ class App extends Component {
 
   componentDidMount = async () => {
     const jobhunterId = window.localStorage.getItem('jobhunterId')
+    const update = window.localStorage.getItem('jobhunterUpdate')
 
-    if (jobhunterId) {
+    console.log(jobhunterId)
+    console.log(update)
+
+    // const jobhunterId = null
+    if (jobhunterId && update === "1") {
+      console.log('hello')
       await this.getUserData(jobhunterId)
     } else {
       await this.createUserForDemo()
