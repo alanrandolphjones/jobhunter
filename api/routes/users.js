@@ -12,7 +12,7 @@ router.get('/', async (req, res, next) => {
         const docs = await User.find()
 
         // 2. If successful send back 200 OK with the users
-        console.log(doc)
+        console.log(docs)
         res.status(200).send({
             data: docs
         })

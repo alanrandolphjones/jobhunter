@@ -139,7 +139,7 @@ export default class ComponentName extends Component {
                         </tr>       
                         <tr>
                             <td>
-                                <label htmlFor="contactLastName">Contact First Name:</label>
+                                <label htmlFor="contactLastName">Contact Last Name:</label>
                             </td>
                             <td>
                                 <input type="text" id="contactLastName" value={this.state.contactLastName} onChange={this.handleChange}/>
@@ -181,14 +181,14 @@ export default class ComponentName extends Component {
                                 </select>
                             </td>
                         </tr>
-                        <tr>
+                        {/* <tr>
                             <td>
                                 <label htmlFor="comments">Comments:</label>
                             </td>
                             <td>
                                 <textarea type="text" id="comments" value={this.state.comments} onChange={this.handleChange}></textarea>
                             </td>
-                        </tr>
+                        </tr> */}
                         <tr>
                             <td colSpan="2">
                             <Button type="submit" bsStyle="success" bsSize="large">Submit</Button>

@@ -196,8 +196,13 @@ export default class JobApp extends Component {
             inProgress = false
         }
 
+        
         const lastActionDate = this.getLastActionDate(newProgress)
         const nextActionDate = this.getNextActionDate(lastActionDate, newProgress)
+
+        if (status === 'waitingForInterview' && !nextActionDate) {
+            progress.status = 'interview'
+        }
 
         if (inProgress && almostDone && !nextActionDate) {
             progress.status = 'rejected'
@@ -237,24 +242,29 @@ export default class JobApp extends Component {
                     && this.state.appProperties.progressProps.nextActionDate && !this.state.appProperties.progressProps.almostDone ?
                         <td>{`Send a followup email on ${this.props.getDateString(this.state.appProperties.progressProps.nextActionDate)}`}</td>
                         : null}
+
                     {(this.state.appProperties.progressProps.progress.status === 'applied'
                     || this.state.appProperties.progressProps.progress.status === 'callback'
                     || this.state.appProperties.progressProps.progress.status === 'interview') 
                     && !this.state.appProperties.progressProps.nextActionDate && !this.state.appProperties.progressProps.almostDone ?
                         <td>Send a followup email, ASAP!</td>
                         : null}
+
                     {(this.state.appProperties.progressProps.progress.status === 'applied'
                     || this.state.appProperties.progressProps.progress.status === 'callback'
                     || this.state.appProperties.progressProps.progress.status === 'interview') 
                     && this.state.appProperties.progressProps.nextActionDate && this.state.appProperties.progressProps.almostDone ?
                         <td>Wait for a response!</td>
                         : null}
+
                     {this.state.appProperties.progressProps.progress.status === 'waitingForInterview' && this.state.appProperties.progressProps.nextActionDate ?
                         <td>{`Interview on ${this.props.getDateString(this.state.appProperties.progressProps.nextActionDate)}`}</td>
                     : null}
+
                     {this.state.appProperties.progressProps.progress.status === 'keepInTouch' ?
                         <td>Keep in touch!</td>
                     : null}
+
                     {this.state.appProperties.progressProps.progress.status === 'rejected' ?
                         <td>Rejected</td>
                     : null}

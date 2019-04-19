@@ -201,6 +201,7 @@ class App extends Component {
 
     //Posting demo user to database
     try {
+      console.log(user)
       axios.post('/users', {
         user
       }).then((res) => {
