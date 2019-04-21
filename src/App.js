@@ -32,8 +32,6 @@ class App extends Component {
   authenticateGoogleId = async (id_token) => {
     const res = await axios.post('/users/token', {id_token})
 
-    console.log(res)
-
     const user = res.data.data[0]    
     this.setState({
       user

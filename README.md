@@ -6,7 +6,9 @@ Feel free to play around with the app, but do not input any confidential or sens
 
 ## How It Works
 
-Data is compiled by the user and hosted via MongoDB. For this prototype, the app will create a user with pre-populated data the first time a user visits the website. On subsequent visits, the app will detect a unique ID stored in the browser and automatically sign you in to the account that was previously created.
+Data is compiled by the user and hosted via MongoDB. You may sign in with a Google account or view the app as a 'guest,' which will show you pre-populated data and illustrate the possibilities and flexibility of the app.
+
+For the guest account, the app will create a user with pre-populated data the first time a user visits the website. On subsequent visits, the app will detect a unique ID stored in the browser and automatically sign you in to the account that was previously created.
 
 The app will allow you to create new job applications and input data unique to them. From there, you can create 'interactions' -- applications, callbacks and interviews -- that you will make during the recruitment process. On a weekly basis after each interaction, the app will tell you to send a followup, using node-schedule to keep track of the date.
 
@@ -28,7 +30,5 @@ JobHunter was made with:
 
 # Wishlist
 
-- Account-based signups and logins
 - Improved validation on form submissions
 - Improved styling
-- Responsive design
