@@ -10,12 +10,15 @@ export default class CustomNav extends Component {
 
     componentDidMount = () => {
 
+        console.log(this.props.onFailure)
+
         window.gapi.signin2.render(
             GOOGLE_BUTTON_ID,
             {
                 width: 200,
                 height: 50,
                 onsuccess: this.props.onSuccess,
+                onfailure: this.props.onFailure
             },
         );
 

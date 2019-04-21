@@ -14,27 +14,40 @@ class App extends Component {
 
       this.state = {
         user: null,
-        show: false
+        show: false,
+        error: false
       }
       this.getUserData = this.getUserData.bind(this)
     }
 
   googleSignOut = () => {
-    var auth2 = window.gapi.auth2.getAuthInstance();
-    auth2.signOut().then( () => {
+    if (this.state.user._id === this.state.user.googleSub) {
       this.setState({
-        user: null,
-        login: false
+        user: null
       })
-    });
+    } else {
+      var auth2 = window.gapi.auth2.getAuthInstance();
+      auth2.signOut().then( () => {
+        this.setState({
+          user: null
+        })
+      });
+    }
   }
 
   authenticateGoogleId = async (id_token) => {
+
     const res = await axios.post('/users/token', {id_token})
 
     const user = res.data.data[0]    
     this.setState({
       user
+    })
+  }
+
+  onFailure = () => {
+    this.setState({
+      error: true
     })
   }
 
@@ -266,8 +279,15 @@ class App extends Component {
   }
 
   onSuccess = (googleUser) => {
+
+    console.log(googleUser)
     var id_token = googleUser.getAuthResponse().id_token;
     this.authenticateGoogleId(id_token)
+
+    this.setState({
+      error: false
+    })
+
   }
 
   render() {
@@ -335,8 +355,15 @@ class App extends Component {
             :
               <div className="sign-in">
                 <h2>Sign in with Google or sign in as guest</h2>
+                {this.state.error ? 
+                  <div className="err">Google signin failed! Please check that you have enabled third-party cookies in your browser!</div>
+                :null}
                 <div className="sign-in-container">
-                  <GoogleButton className="sign-in-child" onSuccess={this.onSuccess} />
+                  <GoogleButton 
+                    className="sign-in-child" 
+                    onSuccess={this.onSuccess} 
+                    onFailure={this.onFailure}
+                  />
                   <Button className="sign-in-child" onClick={this.signInAsGuest}>Sign in as guest</Button>
                 </div>
               </div>
