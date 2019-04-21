@@ -44,7 +44,7 @@ router.get('/:user_id', async (req, res, next) => {
         // 3. If we find the specific user, send back 200 + the user doc
 
         res.status(200).send({
-            data: [doc]
+            data: doc
         })
     } catch (e) {
         // 4. If we don't handle the error 
@@ -61,7 +61,8 @@ const getUser = async (payload, next) => {
         if (oldUser.length > 0) {
             return oldUser
         } else {
-           return createNewUser(payload, next)
+            const newUser = await createNewUser(payload, next)
+            return [newUser]
         }
     } catch {
         next(e)
@@ -83,6 +84,8 @@ router.post('/token', async (req, res, next) => {
     try {
         const googleId = await verify(req.body.id_token)
         const doc = await getUser(googleId, next) 
+
+        console.log(doc)
 
         res.status(201).send({
             data: doc
