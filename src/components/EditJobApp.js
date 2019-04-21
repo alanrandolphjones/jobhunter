@@ -41,9 +41,6 @@ export default class ComponentName extends Component {
 
     handleDateChange(event) {
         const datesArray = this.getDatesArray(this.state.postDate)
-
-        console.log(datesArray[event.target.value])
-
         this.setState({ [event.target.id]: datesArray[event.target.value] });
     }
 

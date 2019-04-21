@@ -3,16 +3,26 @@ const Router = express.Router
 const router = Router()
 const { User } = require('../models/User')
 const schedule = require('node-schedule');
+const { OAuth2Client } = require('google-auth-library');
+const client = new OAuth2Client('1038975368984-k7e5cbve8imcuhfn8023ceb8kd6ct9gl.apps.googleusercontent.com');
+
+async function verify(id_token) {
+    const ticket = await client.verifyIdToken({
+        idToken: id_token,
+        audience: '1038975368984-k7e5cbve8imcuhfn8023ceb8kd6ct9gl.apps.googleusercontent.com',
+    });
+    const payload = ticket.getPayload();
+    return payload
+}
 
 // GET /users
 router.get('/', async (req, res, next) => {
 
     try {
         // 1. Find all the users in our database
-        const docs = await User.find()
+        const docs = await User.find(res.body)
 
         // 2. If successful send back 200 OK with the users
-        console.log(docs)
         res.status(200).send({
             data: docs
         })
@@ -24,13 +34,15 @@ router.get('/', async (req, res, next) => {
 
 // Get /users/:user_id
 router.get('/:user_id', async (req, res, next) => {
+
     // 1. Get the user id out of the params
     const userId = req.params.user_id
     // 2. Look up a user by that ID
+
     try {
         const doc = await User.findById(userId)
         // 3. If we find the specific user, send back 200 + the user doc
-        console.log(doc)
+
         res.status(200).send({
             data: [doc]
         })
@@ -40,10 +52,54 @@ router.get('/:user_id', async (req, res, next) => {
     }
 })
 
+// POST /id_token
+
+const getUser = async (payload, next) => {
+    try {
+        const oldUser = await User.find({googleSub: payload['sub']})
+
+        if (oldUser.length > 0) {
+            return oldUser
+        } else {
+           return createNewUser(payload, next)
+        }
+    } catch {
+        next(e)
+    }
+} 
+
+const createNewUser = async (payload, next) => {
+
+    const user = new User({ 
+        googleSub: payload['sub'],
+        userName: payload['email'] ? payload['email'].split('@')[0] : payload['sub']
+    })
+    return await user.save()
+
+}
+
+router.post('/token', async (req, res, next) => {
+        
+    try {
+        const googleId = await verify(req.body.id_token)
+        const doc = await getUser(googleId, next) 
+
+        res.status(201).send({
+            data: doc
+        })
+
+    } catch (e) {
+        // 5. If error, send to the error handler
+        next(e)
+    }
+
+})
+
 // POST /users
 router.post('/', async (req, res, next) => {
 
     const user = new User(req.body.user)
+    user.googleSub = user._id
     
     try {
         const doc = await user.save()
@@ -66,11 +122,9 @@ router.put('/:user_id/jobApp', async (req, res) => {
         user._id, 
         { $set: user })
         .then(doc => {
-            console.log(doc)
             res.status(201).json({ message: "Success", payload: doc });
         })
         .catch(err => {
-            console.log(err);
             res.status(500).json({ message: err.message });
         });
      
@@ -119,9 +173,7 @@ dailyUpdate = () => {
             User.findByIdAndUpdate(
                 user._id,
                 {$set: user}
-            ).then((doc) => {
-                console.log('data updated')
-            })
+            )
 
         })
     })

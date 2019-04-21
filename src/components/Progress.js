@@ -82,7 +82,6 @@ export default class Progress extends Component {
     }
 
     componentWillReceiveProps = (newProps) => {
-        console.log('received props', newProps)
         const progress = this.props.convertDateObjects(newProps.progress)
         const almostDone = this.props.isItAlmostDone(progress)
         let inProgress

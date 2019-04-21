@@ -29,9 +29,6 @@ export default class ChangeStatusPopup extends Component {
     }
 
     componentDidMount() {
-
-        console.log('mounted')
-
         const today = new Date()
         const dates = []
 
@@ -61,7 +58,6 @@ export default class ChangeStatusPopup extends Component {
     }
 
     toInterview() {
-        console.log('applied to interview')
         const date = this.state.dates[this.state.selectedDate]
         this.props.addInteraction(date, 'callback', 'callback')
 

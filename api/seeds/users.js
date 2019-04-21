@@ -10,7 +10,8 @@ const alan = new User({
     lastName: 'Jones',
     userName: 'alan_jones',
     password: 'password',
-    email: 'jones.alan21@gmail.com'
+    email: 'jones.alan21@gmail.com',
+    googleSub: 'alanfakesub'
 })
 
 //One more time!
@@ -19,7 +20,8 @@ const rulo = new User({
     lastName: 'Jones',
     userName: 'rulo_jones',
     password: 'password',
-    email: 'rulo@gmail.com'
+    email: 'rulo@gmail.com',
+    googleSub: 'rulofakesub'
 })
 
 const alanJobApps = []

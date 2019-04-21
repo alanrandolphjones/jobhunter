@@ -15,13 +15,10 @@ export default class ProgressPopup extends Component {
     }
 
     handleChange(event) {
-        console.log(event.target.id)
         this.setState({ [event.target.id]: event.target.value });
     }
 
     getDiffDays(firstDate, secondDate) {
-
-        console.log(firstDate, secondDate)
 
         var oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
         const diffDays = Math.round(Math.abs((firstDate.getTime() - secondDate.getTime()) / (oneDay)));

@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Redirect } from 'react-router-dom';
 import { Modal, Button } from 'react-bootstrap';
-import Datejs from 'datejs'
+import 'datejs'
 import './App.css';
 import axios from 'axios'
 import CustomNav from './components/CustomNav'
 import Home from './components/Home'
+import GoogleButton from './components/GoogleButton'
 
 class App extends Component {
     constructor(props) {
@@ -13,14 +14,34 @@ class App extends Component {
 
       this.state = {
         user: null,
-        show: true
+        show: false,
+        login: false
       }
       this.getUserData = this.getUserData.bind(this)
     }
 
+  googleSignOut = () => {
+    var auth2 = window.gapi.auth2.getAuthInstance();
+    auth2.signOut().then( () => {
+      this.setState({
+        user: null,
+        login: false
+      })
+    });
+  }
+
+  authenticateGoogleId = async (id_token) => {
+    const res = await axios.post('/users/token', {id_token})
+    const user = res.data.data[0]    
+    this.setState({
+      user
+    })
+  }
+
   //Pulls in user data and sets in state
   getUserData = async (id) => {
     const res = await axios.get(`/users/${id}`)
+
     const user = res.data.data[0]
     this.setState({
       user
@@ -207,7 +228,6 @@ class App extends Component {
         }
       ]
     }
-
     //Posting demo user to database
     try {
       axios.post('/users', {
@@ -225,19 +245,16 @@ class App extends Component {
 
   }
 
-  componentDidMount = async () => {
+
+  signInAsGuest = () => {
+
     const jobhunterId = window.localStorage.getItem('jobhunterId')
     const update = window.localStorage.getItem('jobhunterUpdate')
-
-    console.log(jobhunterId)
-    console.log(update)
-
-    // const jobhunterId = null
+    
     if (jobhunterId && update === "1") {
-      console.log('hello')
-      // await this.getUserData(jobhunterId)
+     this.getUserData(jobhunterId)
     } else {
-      // await this.createUserForDemo()
+     this.createUserForDemo()
     }
 
   }
@@ -248,15 +265,9 @@ class App extends Component {
     })
   }
 
-  onSignIn = (googleUser) => {
-    var profile = googleUser.getBasicProfile();
-    console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
-    console.log('Name: ' + profile.getName());
-    console.log('Image URL: ' + profile.getImageUrl());
-    console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
-
+  onSuccess = (googleUser) => {
     var id_token = googleUser.getAuthResponse().id_token;
-    console.log("ID Token: " + id_token);
+    this.authenticateGoogleId(id_token)
   }
 
   render() {
@@ -279,7 +290,10 @@ class App extends Component {
             </Modal.Footer>
           </Modal>
 
-          <CustomNav />
+          <CustomNav 
+            googleSignOut={this.googleSignOut} 
+            user={this.state.user}
+          />
 
           <Route 
             exact
@@ -319,7 +333,13 @@ class App extends Component {
                 to={`/user/${this.state.user.userName}`}
               />
             :
-              <div className="g-signin2" data-onsuccess="onSignIn"></div>
+              <div className="sign-in">
+                <h2>Sign in with Google or sign in as guest</h2>
+                <div className="sign-in-container">
+                  <GoogleButton className="sign-in-child" onSuccess={this.onSuccess} />
+                  <Button className="sign-in-child" onClick={this.signInAsGuest}>Sign in as guest</Button>
+                </div>
+              </div>
             )}
           />
 

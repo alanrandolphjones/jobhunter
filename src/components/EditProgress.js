@@ -240,7 +240,6 @@ export default class EditProgress extends Component {
                                             <td>
                                                 <select name="followup" id={`followup_${i}_${j}`} value="30" onChange={this.handleChange}>
                                                     {this.getDatesArray(followup).map((date, k) => {
-                                                        console.log()
                                                         return <option key={k} value={k}>{this.props.getDateString(date)}</option>
                                                     })}
                                                 </select>
